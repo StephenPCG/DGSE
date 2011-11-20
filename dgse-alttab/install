@@ -1,0 +1,6 @@
+#!/bin/bash
+
+sudo rm -rf /usr/share/gnome-shell/extensions/alttab@linuxdeepin.com
+sudo rm /usr/share/glib-2.0/schemas/linuxdeepin.dgse.alttab.gschema.xml
+sudo cp -R usr /
+sudo glib-compile-schemas /usr/share/glib-2.0/schemas/

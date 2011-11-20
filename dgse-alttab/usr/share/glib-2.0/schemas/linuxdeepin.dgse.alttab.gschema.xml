@@ -1,0 +1,19 @@
+<schemalist gettext-domain="gnome-shell-extensions">
+  <enum id="linuxdeepin.dgse.alttab.BehaviourMode">
+    <value value="0" nick="native"/>
+    <value value="1" nick="all_thumbnails"/>
+    <value value="2" nick="workspace_icons"/>
+  </enum>
+  <schema id="linuxdeepin.dgse.alttab" path="/linuxdeepin/dgse/alttab/">
+    <key name="behaviour" enum="linuxdeepin.dgse.alttab.BehaviourMode">
+      <default>'native'</default>
+      <summary>The alt tab behaviour.</summary>
+      <description>Sets the Alt-Tab behaviour. Possible values are: native, all_thumbnails and workspace_icons.</description>
+    </key>
+    <key type="b" name="first-time">
+      <default>true</default>
+      <summary>Indicates if Alternate Tab is newly installed</summary>
+      <description>Ask the user for a default behaviour if true.</description>
+    </key>
+  </schema>
+</schemalist>
