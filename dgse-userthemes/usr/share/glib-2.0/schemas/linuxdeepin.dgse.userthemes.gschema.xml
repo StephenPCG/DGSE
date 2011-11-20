@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+  <schema path="/linuxdeepin/dgse/userthemes/" id="linuxdeepin.dgse.userthemes">
+    <key type="s" name="name">
+      <default>""</default>
+      <summary>Theme name</summary>
+      <description>The name of the theme, to be loaded from ~/.themes/name/gnome-shell</description>
+    </key>
+  </schema>
+</schemalist>
