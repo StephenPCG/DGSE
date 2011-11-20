@@ -1,0 +1,12 @@
+Source: dgse-shutdownmenu
+Section: admin
+Priority: optional
+Maintainer: Hiweed <hiweed@gmail.com>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: dgse-shutdownmenu
+Architecture: all
+Depends: libglib2.0-bin
+Description: Gnome Shell Extension Shutdown Menu
+ Replace Suspend menu with Shutdown and add Suspend/Hibernate to Power Off dialog

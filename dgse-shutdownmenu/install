@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sudo rm -rf /usr/share/gnome-shell/extensions/shutdownmenu@linuxdeepin.com
+sudo cp -R usr /
