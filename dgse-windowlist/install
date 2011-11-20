@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sudo rm -rf /usr/share/gnome-shell/extensions/windowlist@linuxdeepin.com
+sudo cp -R usr /

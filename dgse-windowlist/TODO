@@ -1,0 +1,8 @@
+ - Make right click menu appear/disappear faster, or even without animations
+ - Reduce the gap between boxes --> done by theme
+ - Make the extension use more space (either by hiding the _centerBox or by telling _leftBox to fill the space) <-- this is fixed by placing it in the bottom panel
+ - Emphasize the selected window a little more (either with more contrast/brightness, with borders, or with depth) <-- this is done by the theme
+ - Use Gettext to l10n labels
+ - Replace show Desktop icon with a toggle button
+ - BUG: When you change the workspace, and then come back.. after that, the window list is confused as to which window is active, minimized etc... this is visible with the underline (depending on the theme) and with the "[]" placed around the title when minimized (missing after it gets confused)
+
