@@ -1,0 +1,12 @@
+Source: dgse-smartoverview
+Section: admin
+Priority: optional
+Maintainer: Hiweed <hiweed@gmail.com>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: dgse-smartoverview
+Architecture: all
+Depends: libglib2.0-bin
+Description: Gnome Shell Extension Smart Overview
+ Arrange windows in overview in a smart way

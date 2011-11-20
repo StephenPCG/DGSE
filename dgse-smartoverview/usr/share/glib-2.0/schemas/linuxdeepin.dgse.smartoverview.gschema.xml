@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gnome-shell-extensions">
+  <enum id="linuxdeepin.dgse.smartoverview.strategy">
+    <value value="0" nick="natural"/>
+    <value value="1" nick="grid"/>
+  </enum>
+  <schema path="/linuxdeepin/dgse/smartoverview/" id="linuxdeepin.dgse.smartoverview">
+    <key name="strategy" enum="linuxdeepin.dgse.smartoverview.strategy">
+      <default>'natural'</default>
+      <summary>Window placement strategy</summary>
+      <description>The algorithm used to layout thumbnails in the overview. 'grid' to use the default grid based algorithm, 'natural' to use another one that reflects more the position and size of the actual window</description>
+    </key>
+    <key type="b" name="use-more-screen">
+      <default>true</default>
+      <summary>Use more screen for windows</summary>
+      <description>Try to use more screen for placing window thumbnails by adapting to screen aspect ratio, and consolidating them further to reduce the bounding box. This setting applies only with the natural placement strategy.</description>
+    </key>
+    <key type="b" name="window-captions-on-top">
+      <default>true</default>
+      <summary>Place window captions on top</summary>
+      <description>If true, place window captions on top the respective thumbnail, overriding shell default of placing it at the bottom. Changing this setting requires restarting the shell to have any effect.</description>
+    </key>
+  </schema>
+</schemalist>
