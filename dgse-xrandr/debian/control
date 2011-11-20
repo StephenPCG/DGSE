@@ -1,0 +1,12 @@
+Source: dgse-xrandr
+Section: admin
+Priority: optional
+Maintainer: Hiweed <hiweed@gmail.com>
+Build-Depends: debhelper (>= 5)
+Standards-Version: 3.7.2
+
+Package: dgse-xrandr
+Architecture: all
+Depends: gir1.2-gnomedesktop-3.0
+Description: Gnome Shell Extension Monitor Status
+ Add a systems status menu for rotating monitors

@@ -7,6 +7,5 @@ Standards-Version: 3.7.2
 
 Package: dgse-noa11y
 Architecture: all
-Depends: libglib2.0-bin
 Description: Gnome Shell Extension No A11Y
  Hides the accessibility icon in Gnome 3

@@ -7,6 +7,5 @@ Standards-Version: 3.7.2
 
 Package: dgse-windowlist
 Architecture: all
-Depends: libglib2.0-bin
 Description: Gnome Shell Extension Window List
  A window list for Gnome 3
