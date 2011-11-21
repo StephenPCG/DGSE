@@ -1,9 +1,9 @@
 Source: dgse-shutdownmenu
 Section: admin
 Priority: optional
-Maintainer: Hiweed <hiweed@gmail.com>
-Build-Depends: debhelper (>= 5)
-Standards-Version: 3.7.2
+Maintainer: Leng Guanghua <hiweed@gmail.com>
+Build-Depends: debhelper (>= 8)
+Standards-Version: 3.9.2
 
 Package: dgse-shutdownmenu
 Architecture: all

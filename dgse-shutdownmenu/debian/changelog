@@ -1,0 +1,12 @@
+dgse-shutdownmenu (1.0.1-1) oneiric; urgency=low
+
+  * Copy mgse-shutdownmenu to dgse-shutdownmenu
+
+ -- Leng Ganghua <hiweed@gmail.com>  Mon, 21 Nov 2011 10:50:55 +0800
+
+mgse-shutdownmenu (1.0.0) lisa; urgency=low
+
+  * Initial release
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  16 Oct 2011 17:59:00 +0000
+
