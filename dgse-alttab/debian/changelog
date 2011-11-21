@@ -1,0 +1,18 @@
+dgse-alttab (1.0.1-1) oneiric; urgency=low
+
+  * Copy mgse-alttab to dgse-alttab
+
+ -- Leng Ganghua <hiweed@gmail.com>  Mon, 21 Nov 2011 10:50:55 +0800
+
+mgse-alttab (1.0.1) lisa; urgency=low
+
+  * Changed compatibility to "3.2"
+
+ -- Clement Lefebvre <root@linuxmint.com>  Thu,  27 Oct 2011 19:39:00 +0000
+
+mgse-alttab (1.0.0) lisa; urgency=low
+
+  * Initial release
+
+ -- Clement Lefebvre <root@linuxmint.com>  Sun,  16 Oct 2011 17:59:00 +0000
+
