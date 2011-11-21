@@ -1,9 +1,9 @@
 Source: dgse-xrandr
 Section: admin
 Priority: optional
-Maintainer: Hiweed <hiweed@gmail.com>
-Build-Depends: debhelper (>= 5)
-Standards-Version: 3.7.2
+Maintainer: Leng Ganghua <hiweed@gmail.com>
+Build-Depends: debhelper (>= 8)
+Standards-Version: 3.9.2
 
 Package: dgse-xrandr
 Architecture: all
