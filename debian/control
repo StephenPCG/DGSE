@@ -1,0 +1,48 @@
+Source: dgse
+Section: admin
+Priority: optional
+Maintainer: Leng Guanghua <hiweed@gmail.com>
+Build-Depends: debhelper (>= 8)
+Standards-Version: 3.9.2
+
+Package: dgse-alttab
+Architecture: all
+Depends: ${misc:Depends}, libglib2.0-bin, gnome-shell (>=3.2.0-1~)
+Description: GNOME Shell Extension Alt Tab
+ Traditional Alt Tab for GNOME Shell
+
+Package: dgse-noa11y
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Description: GNOME Shell Extension No A11Y
+ Hides the accessibility icon in GNOME 3
+
+Package: dgse-shutdownmenu
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Description: GNOME Shell Extension Shutdown Menu
+ Replace Suspend menu with Shutdown and add Suspend/Hibernate to Power Off dialog
+
+Package: dgse-smartoverview
+Architecture: all
+Depends: ${misc:Depends}, libglib2.0-bin, gnome-shell (>=3.2.0-1~)
+Description: GNOME Shell Extension Smart Overview
+ Arrange windows in overview in a smart way
+
+Package: dgse-userthemes
+Architecture: all
+Depends: ${misc:Depends}, libglib2.0-bin, gnome-shell (>=3.2.0-1~)
+Description: GNOME Shell Extension User Themes
+ Load shell themes from user directory
+
+Package: dgse-windowlist
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Description: GNOME Shell Extension Window List
+ A window list for GNOME 3
+
+Package: dgse-xrandr
+Architecture: all
+Depends: ${misc:Depends}, gir1.2-gnomedesktop-3.0, gnome-shell (>=3.2.0-1~)
+Description: GNOME Shell Extension Monitor Status
+ Add a systems status menu for rotating monitors
