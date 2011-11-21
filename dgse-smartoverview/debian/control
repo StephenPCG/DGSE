@@ -7,6 +7,6 @@ Standards-Version: 3.9.2
 
 Package: dgse-smartoverview
 Architecture: all
-Depends: libglib2.0-bin
+Depends: ${misc:Depends}, libglib2.0-bin, gnome-shell (>=3.2.0-1~)
 Description: Gnome Shell Extension Smart Overview
  Arrange windows in overview in a smart way

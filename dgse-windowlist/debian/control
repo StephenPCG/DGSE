@@ -7,5 +7,6 @@ Standards-Version: 3.9.2
 
 Package: dgse-windowlist
 Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Description: Gnome Shell Extension Window List
  A window list for Gnome 3
