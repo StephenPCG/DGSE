@@ -23,9 +23,14 @@ License: LGPL-3+
  See /usr/share/common-licenses/LGPL-3 on your debian system.
 
 Files: *
-Copyright: 2011 Linux Deepin Team
+Copyright: 2011 jw@bargsten.org
+           2011 thomas.bouffon@gmail.com
+	   2011 Deepin, Inc.
+	   2011 Zhang Cheng <zhangcheng@linuxdeepin.com>
 License: LGPL-3+
 
 Files: debian/*
-Copyright: 2011 Zhang Cheng <zhangcheng@linuxdeepin.com>
+Copyright: 2011 Deepin, Inc.
+           2011 Zhang Cheng <zhangcheng@linuxdeepin.com>
+	   2011 Leng Ganghua <hiweed@gmail.com>
 License: LGPL-3+
