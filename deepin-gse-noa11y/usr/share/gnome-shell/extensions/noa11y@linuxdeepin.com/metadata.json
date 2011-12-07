@@ -1,8 +1,0 @@
-{
-"uuid": "noa11y@linuxdeepin.com",
-"name": "noa11y",
-"localedir": "/usr/share/locale",
-"description": "Hides the accessibility button",
-"shell-version": [ "3.2" ],
-"url": "http://github.com/StephenPCG/dgse"
-}

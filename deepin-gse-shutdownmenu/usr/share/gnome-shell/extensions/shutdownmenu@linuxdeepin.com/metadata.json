@@ -1,7 +1,0 @@
-{
-"shell-version": ["3.2"], 
-"uuid": "shutdownmenu@linuxdeepin.com", 
-"name": "Shutdown Menu",
-"description": "Replace Suspend menu with Shutdown and add Suspend/Hibernate to Power Off dialog", 
-"url": "http://github.com/StephenPCG/dgse"
-}

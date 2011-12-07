@@ -1,6 +1,0 @@
-#!/bin/bash
-
-sudo rm -rf /usr/share/gnome-shell/extensions/userthemes@linuxdeepin.com
-sudo rm -f /usr/share/glib-2.0/schemas/linuxdeepin.dgse.userthemes.gschema.xml
-sudo cp -R usr /
-sudo glib-compile-schemas /usr/share/glib-2.0/schemas/

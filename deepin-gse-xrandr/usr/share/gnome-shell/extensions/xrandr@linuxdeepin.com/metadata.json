@@ -1,8 +1,0 @@
-{
-"uuid": "xrandr@linuxdeepin.com",
-"name": "Monitor Status",
-"description": "Add a systems status menu for rotating monitors (overrides what is currently provided by gnome-settings-daemon)",
-"shell-version": [ "3.2" ],
-"localedir": "/usr/share/locale",
-"url": "http://github.com/linuxdeepin/mgse"
-}

@@ -1,4 +1,0 @@
-#!/bin/bash
-
-sudo rm -rf /usr/share/gnome-shell/extensions/noa11y@linuxdeepin.com
-sudo cp -R usr /
