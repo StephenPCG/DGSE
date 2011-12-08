@@ -5,66 +5,386 @@ Maintainer: Zhang Cheng <zhangcheng@linuxdeepin.com>
 Build-Depends: debhelper (>= 8)
 Standards-Version: 3.9.2
 
-Package: deepin-gse-alttab
+Package: deepin-gse-all
 Architecture: all
-Depends: ${misc:Depends}, libglib2.0-bin, gnome-shell (>=3.2.0-1~)
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~),
+    deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-noa11y, deepin-gse-shutdownmenu, deepin-gse-smartoverview, 
-    deepin-gse-userthemes, deepin-gse-windowlist, deepin-gse-xrandr
-Description: GNOME Shell Extension Alt Tab
- Traditional Alt Tab for GNOME Shell
+Description: Deepin default GNOME shell extensions.
+ This is a meta package that will install all Deepin default GNOME shell 
+ extensions.
+ .
+ Some extensions are still under development, whose name are not 
+ determined yet, will be temporarily packaged into this package.
 
-Package: deepin-gse-noa11y
+Package: deepin-gse-classic-systray
 Architecture: all
 Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-alttab, deepin-gse-shutdownmenu, deepin-gse-smartoverview, 
-    deepin-gse-userthemes, deepin-gse-windowlist, deepin-gse-xrandr
-Description: GNOME Shell Extension No A11Y
- Hides the accessibility icon in GNOME 3
+Suggests: deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- GNOME2 style systray
+ This is a GNOME shell extension, provides a GNOME2 style systray.
 
-Package: deepin-gse-shutdownmenu
+Package: deepin-gse-drive-menu
 Architecture: all
 Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-alttab, deepin-gse-noa11y, deepin-gse-smartoverview, 
-    deepin-gse-userthemes, deepin-gse-windowlist, deepin-gse-xrandr
-Description: GNOME Shell Extension Shutdown Menu
- Replace Suspend menu with Shutdown and add Suspend/Hibernate to Power Off 
- dialog
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Removable drive menu
+ This is a GNOME shell extension, it provides a status menu for accessing
+ and unmounting removable devices.
 
-Package: deepin-gse-smartoverview
-Architecture: all
-Depends: ${misc:Depends}, libglib2.0-bin, gnome-shell (>=3.2.0-1~)
-Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-alttab, deepin-gse-noa11y, deepin-gse-shutdownmenu, 
-    deepin-gse-userthemes, deepin-gse-windowlist, deepin-gse-xrandr
-Description: GNOME Shell Extension Smart Overview
- Arrange windows in overview in a smart way
-
-Package: deepin-gse-userthemes
-Architecture: all
-Depends: ${misc:Depends}, libglib2.0-bin, gnome-shell (>=3.2.0-1~)
-Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-alttab, deepin-gse-noa11y, deepin-gse-shutdownmenu, 
-    deepin-gse-smartoverview, deepin-gse-windowlist, deepin-gse-xrandr
-Description: GNOME Shell Extension User Themes
- Load shell themes from user directory
-
-Package: deepin-gse-windowlist
+Package: deepin-gse-extend-left-box
 Architecture: all
 Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-alttab, deepin-gse-noa11y, deepin-gse-shutdownmenu, 
-    deepin-gse-smartoverview, deepin-gse-userthemes, deepin-gse-xrandr
-Description: GNOME Shell Extension Window List
- A window list for GNOME 3
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Extend left box
+ This is a GNOME shell extension, it extends the _leftBox of topbar,
+ combined with window-list extension, you can use the maximum width
+ of the topbar.
+
+Package: deepin-gse-hide-dash
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Hide dash
+ This is a GNOME shell extension, it hides the favourites dock in overview
+ screen.
+
+Package: deepin-gse-hide-username
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Hide username
+ This is a GNOME shell extension, it hides the username in status area.
+
+Package: deepin-gse-move-clock
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Move Clock
+ This is a GNOME shell extension, it moves the clock to the right side.
+
+Package: deepin-gse-no-a11y
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- No a11y
+ This is a GNOME shell extension, it hides the accessibility icon in GNOME 3.
+
+Package: deepin-gse-no-click-tab
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- No Click Tab
+ This is a GNOME shell extension, no need to click to switch tab in overview
+ screen.
+
+Package: deepin-gse-shutdown-menu
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Alternative shutdown menu
+ This is a GNOME shell extension, it changes the default shutdown menu.
+
+Package: deepin-gse-system-monitor
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~), libglib2.0-bin, gir1.2-gtop-2.0
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- System monitor
+ This is a GNOME shell extension, it displays the system monitor in systray.
+
+Package: deepin-gse-window-list
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Window list
+ This is a GNOME shell extension, it displays window list in the topbar.
+
+Package: deepin-gse-windowoverlay-icons
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Window overlay icons
+ This is a GNOME shell extension, it displays an icon on the window overlay.
+
+Package: deepin-gse-windows-alt-tab
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Windows alt-tab
+ This is a GNOME shell extension, window alt tab.
+
+Package: deepin-gse-windows-navigator
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-workspace-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Windows navigator
+ This is a GNOME shell extension, windows navigator.
+
+Package: deepin-gse-workspace-navigator
+Architecture: all
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
+Recommends: gnome-tweak-tool (>=3.2.0-1~)
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-xrandr
+Description: GNOME shell extension -- Workspace navigator
+ This is a GNOME shell extension, workspace navigator.
 
 Package: deepin-gse-xrandr
 Architecture: all
-Depends: ${misc:Depends}, gir1.2-gnomedesktop-3.0, gnome-shell (>=3.2.0-1~)
+Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~), gir1.2-gnomedesktop-3.0 
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-alttab, deepin-gse-noa11y, deepin-gse-shutdownmenu, 
-    deepin-gse-smartoverview, deepin-gse-userthemes, deepin-gse-windowlist
-Description: GNOME Shell Extension Monitor Status
- Add a systems status menu for rotating monitors
+Suggests: deepin-gse-classic-systray,
+    deepin-gse-drive-menu,
+    deepin-gse-extend-left-box,
+    deepin-gse-hide-dash,
+    deepin-gse-hide-username,
+    deepin-gse-move-clock,
+    deepin-gse-no-a11y,
+    deepin-gse-no-click-tab,
+    deepin-gse-shutdown-menu,
+    deepin-gse-system-monitor,
+    deepin-gse-window-list,
+    deepin-gse-windowoverlay-icons,
+    deepin-gse-windows-alt-tab,
+    deepin-gse-windows-navigator,
+    deepin-gse-workspace-navigator
+Description: GNOME shell extension -- Display control
+ This is a GNOME shell extension, display control.

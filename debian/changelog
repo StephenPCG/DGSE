@@ -1,3 +1,15 @@
+deepin-gse (1.0.3-1) oneiric; urgency=low
+
+  * Fix depends, dgse-system-monitor depends on gir1.2-gtop-2.0
+
+ -- Zhang Cheng <zhangcheng@linuxdeepin.com>  Wed, 07 Dec 2011 18:50:27 +0800
+
+deepin-gse (1.0.2-1) oneiric; urgency=low
+
+  * Import new extensions
+
+ -- Zhang Cheng <zhangcheng@linuxdeepin.com>  Wed, 7 Dec 2011 16:29:10 +0800
+
 deepin-gse (1.0.1-2) oneiric; urgency=low
 
   * Modify Recommends and Suggests in control file
