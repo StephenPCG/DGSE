@@ -385,9 +385,16 @@ WindowSwitcher.prototype = {
 			this._addIcon(workspaceIcons[ii]);
 		}
 		
-		for (index in otherWorkspaces) {
+		// Sort workspace by index.
+		let keys = [];
+		for (k in otherWorkspaces) {
+			keys.push(k);
+		}
+		keys.sort();
+		
+		for (let jj = 0; jj < keys.length; jj++) {
 			this.addSeparator();
-			this._addIcon(otherWorkspaces[index]);
+			this._addIcon(otherWorkspaces[keys[jj]]);
 		}
 		
         this._curApp = -1;
