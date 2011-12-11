@@ -87,22 +87,22 @@ SwitchThumbnailIcon.prototype = {
 
     select: function() {
         if (!this.highlighted) {
-			if (this.isWorkspace) {
-				this.actor.add_style_pseudo_class('workspaceSelected');
-			} else {
-				this.actor.add_style_pseudo_class('windowSelected');
-			}
+            if (this.isWorkspace) {
+                this.actor.add_style_pseudo_class('workspaceSelected');
+            } else {
+                this.actor.add_style_pseudo_class('windowSelected');
+            }
             this.highlighted = true;
         }
     },
 
     unselect: function() {
         if (this.highlighted) {
-			if (this.isWorkspace) {
-				this.actor.remove_style_pseudo_class('workspaceSelected');
-			} else {
-				this.actor.remove_style_pseudo_class('windowSelected');
-			}
+            if (this.isWorkspace) {
+                this.actor.remove_style_pseudo_class('workspaceSelected');
+            } else {
+                this.actor.remove_style_pseudo_class('windowSelected');
+            }
             this.highlighted = false;
         }
     },
@@ -180,10 +180,6 @@ SwitchThumbnailIcon.prototype = {
     },
 
     set_size: function(iconWidth, iconHeight) {
-        let mutterWindow = this.window.get_compositor_private();
-        let windowTexture = mutterWindow.get_texture ();
-        let [width, height] = windowTexture.get_size();
-        let scale = Math.min(1.0, iconWidth / width);
         let clone = null;
 
         if (this.isWorkspace) {
@@ -191,12 +187,18 @@ SwitchThumbnailIcon.prototype = {
             clone = this.get_workspace_clone(this.window.get_workspace().index());
         } else {
             // Otherwise show application thumbnail.
+            let mutterWindow = this.window.get_compositor_private();
+            let windowTexture = mutterWindow.get_texture ();
+            let [width, height] = windowTexture.get_size();
+            let scale = Math.min(1.0, iconWidth / width, iconHeight / height);
+
             clone = new Clutter.Group({clip_to_allocation: true});
             clone.set_size(this.iconWidth, this.iconHeight);
 
             let windowClone = new Clutter.Clone (
                 { source: windowTexture,
                   reactive: true,
+				  x: (this.iconWidth - (width * scale)) / 2,
                   y: (this.iconHeight - (height * scale)) / 2,
                   width: width * scale,
                   height: height * scale
@@ -305,7 +307,7 @@ SwitchPopupWindow.prototype = {
         this.modifierMask = 0;
         this.currentThumbnailIndex = 0;
 
-		this.enableHoverFlag = false;
+        this.enableHoverFlag = false;
         this.hoverTimeoutId = Mainloop.timeout_add(ENABLE_HOVER_TIMEOUT, Lang.bind(this, this.enableHover));
 
         Main.uiGroup.add_actor(this.actor);
