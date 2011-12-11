@@ -62,7 +62,7 @@ const DND_RAISE_APP_TIMEOUT = 500;
 /*************************************************************************************/
 function hideDock_size () {
     if (hideable){
-       let monitor = Main.layoutManager.primaryMonitor
+       let monitor = Main.layoutManager.primaryMonitor;
        let position_x = monitor.x;
        let height = (this._nicons)*(this._item_size + this._spacing) + 2*this._spacing;
        let width = this._item_size + 4*this._spacing;
@@ -84,7 +84,7 @@ function hideDock_size () {
                    }
                    this.actor.set_position (position_x,monitor.y+(monitor.height-height)/2);
                    this.actor.set_size(width,height);
-              },
+              }
        });
        hideDock=true;
     }
@@ -932,7 +932,7 @@ DockIconMenu.prototype = {
         }
         this.close();
     }
-}
+};
 
 function init(extensionMeta) {
     imports.gettext.bindtextdomain('gnome-shell-extensions', extensionMeta.localedir);
