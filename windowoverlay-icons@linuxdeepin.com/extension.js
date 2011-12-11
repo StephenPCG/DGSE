@@ -17,7 +17,7 @@ function injectToFunction(parent, name, func) {
         if (ret === undefined)
                 ret = func.apply(this, arguments);
         return ret;
-    }
+    };
     return origin;
 }
 
