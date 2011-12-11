@@ -13,8 +13,8 @@ const St = imports.gi.St;
 const Tweener = imports.ui.tweener;
 const WindowManager = imports.ui.windowManager;
 
-const POPUP_FADE_TIME = 0.0; // seconds
 const POPUP_FADE_OUT_TIME = 0.1; // seconds
+const ENABLE_HOVER_TIMEOUT = 500; // milliseconds
 
 const SELECT_KEEP = 0;
 const SELECT_NEXT = 1;
@@ -43,15 +43,13 @@ SwitchThumbnailIcon.prototype = {
         this.isWorkspace = !(window.get_workspace() == activeWorkspace);
 
         this.highlighted = false;
-        this.cachedWindows = [];
-        this.cachedWindows.push(window);
 
         this.actor = new St.Button({style_class: 'thumbnail-icon',
                                     reactive: true,
-									can_focus: true});
+                                    can_focus: true});
 
         this.actorBox = new St.BoxLayout({vertical: true,
-										  can_focus: true});
+                                          can_focus: true});
         this.actor.set_child(this.actorBox);
 
         this.icon = null;
@@ -86,17 +84,25 @@ SwitchThumbnailIcon.prototype = {
             this.actorBox.add(bin);
         }
     },
-	
+
     select: function() {
         if (!this.highlighted) {
-            this.actor.add_style_pseudo_class('selected');
+			if (this.isWorkspace) {
+				this.actor.add_style_pseudo_class('workspaceSelected');
+			} else {
+				this.actor.add_style_pseudo_class('windowSelected');
+			}
             this.highlighted = true;
         }
     },
 
     unselect: function() {
         if (this.highlighted) {
-            this.actor.remove_style_pseudo_class('selected');
+			if (this.isWorkspace) {
+				this.actor.remove_style_pseudo_class('workspaceSelected');
+			} else {
+				this.actor.remove_style_pseudo_class('windowSelected');
+			}
             this.highlighted = false;
         }
     },
@@ -198,11 +204,11 @@ SwitchThumbnailIcon.prototype = {
             clone.add_actor(windowClone);
 
             let appIconSize = 32;
-			let appIconBoxSize = 42;
+            let appIconBoxSize = 42;
             let appIcon = this.app.create_icon_texture(appIconSize);
-			let appIconBox = new St.Bin( { style_class: 'thumbnail-app-icon-box'});
+            let appIconBox = new St.Bin( { style_class: 'thumbnail-app-icon-box'});
             appIconBox.set_position(this.iconWidth - appIconBoxSize, this.iconHeight - appIconBoxSize);
-			appIconBox.add_actor(appIcon);
+            appIconBox.add_actor(appIcon);
             clone.add_actor(appIconBox);
         }
 
@@ -223,7 +229,7 @@ SwitchPopupWindow.prototype = {
         this.monitorWidth = primary.width;
         this.monitorHeight = primary.height;
         this.windowWidth = this.monitorWidth * 2 / 3;
-		this.thumbnailBorder = 1;
+        this.thumbnailBorder = 1;
         this.thumbnailPaddingX = 10;
         this.thumbnailPaddingY = 10;
         this.thumbnailFontSize = 15;
@@ -241,7 +247,7 @@ SwitchPopupWindow.prototype = {
         this.actor = new Shell.GenericContainer({ name: 'altTabPopup',
                                                   reactive: true,
                                                   visible: false,
-												  can_focus: true
+                                                  can_focus: true
                                                 });
 
         this.actor.connect('get-preferred-width', Lang.bind(this, this.getPreferredWidth));
@@ -260,13 +266,19 @@ SwitchPopupWindow.prototype = {
                            {row: iconRow,
                             col: iconColumn
                            });
-			
-			// Handle hover event.
-			this.windows[i].actor.connect(
-				'notify::hover', 
-				Lang.bind(this, function() {
-							  this.selectThumbnail(SELECT_KEEP, index);
-						  }));
+
+            // Handle hover event.
+            this.windows[i].actor.connect(
+                'notify::hover',
+                Lang.bind(this, function() {
+                              this.selectThumbnail(SELECT_KEEP, index, true);
+                          }));
+            this.windows[i].actor.connect(
+                'clicked',
+                Lang.bind(this, function() {
+                              this.currentThumbnailIndex = index;
+                              this.finish();
+                          }));
         }
 
         for (let j = 0; j < this.workspaces.length; j++) {
@@ -274,20 +286,35 @@ SwitchPopupWindow.prototype = {
             let iconRow = Math.floor(index / this.thumbnailColumns);
             let iconColumn = index % this.thumbnailColumns;
             this.table.add(this.workspaces[j].actor, {row: iconRow, col: iconColumn});
-			
-			// Handle hover event.
-			this.workspaces[j].actor.connect(
-				'notify::hover', 
-				Lang.bind(this, function() {
-							  this.selectThumbnail(SELECT_KEEP, index);
-						  }));
+
+            // Handle hover event.
+            this.workspaces[j].actor.connect(
+                'notify::hover',
+                Lang.bind(this, function() {
+                              this.selectThumbnail(SELECT_KEEP, index, true);
+                          }));
+            this.workspaces[j].actor.connect(
+                'clicked',
+                Lang.bind(this, function() {
+                              this.currentThumbnailIndex = index;
+                              this.finish();
+                          }));
         }
 
         this.haveModal = false;
         this.modifierMask = 0;
         this.currentThumbnailIndex = 0;
 
+		this.enableHoverFlag = false;
+        this.hoverTimeoutId = Mainloop.timeout_add(ENABLE_HOVER_TIMEOUT, Lang.bind(this, this.enableHover));
+
         Main.uiGroup.add_actor(this.actor);
+    },
+
+    enableHover: function() {
+        this.enableHoverFlag = true;
+
+        return false;
     },
 
     getAppsList: function() {
@@ -315,8 +342,8 @@ SwitchPopupWindow.prototype = {
                     // Add other worspace.
                     workspaceIndex = windows[j].get_workspace().index();
                     if (otherWorkspaces[workspaceIndex]) {
-                        let oldTime = otherWorkspaces[workspaceIndex].cachedWindows[0].get_user_time();
-                        let newTime = appIcon.cachedWindows[0].get_user_time();
+                        let oldTime = otherWorkspaces[workspaceIndex].window.get_user_time();
+                        let newTime = appIcon.window.get_user_time();
                         if (newTime > oldTime) {
                             // Update topest application in workspace dict.
                             otherWorkspaces[workspaceIndex] = appIcon;
@@ -355,8 +382,8 @@ SwitchPopupWindow.prototype = {
     },
 
     _sortAppIcon : function(appIcon1, appIcon2) {
-        let t1 = appIcon1.cachedWindows[0].get_user_time();
-        let t2 = appIcon2.cachedWindows[0].get_user_time();
+        let t1 = appIcon1.window.get_user_time();
+        let t2 = appIcon2.window.get_user_time();
         if (t2 > t1) return 1;
         else return -1;
     },
@@ -407,12 +434,17 @@ SwitchPopupWindow.prototype = {
 
         this.actor.show();
 
-        this.selectThumbnail(SELECT_NEXT, this.currentThumbnailIndex);
+        this.selectThumbnail(SELECT_NEXT, this.currentThumbnailIndex, false);
 
         return true;
     },
 
     finish: function() {
+        let currentThumbnail = this.getThumbnailByIndex(this.currentThumbnailIndex);
+        if (currentThumbnail) {
+            Main.activateWindow(currentThumbnail.window);
+        }
+
         this.destroy();
     },
 
@@ -448,105 +480,103 @@ SwitchPopupWindow.prototype = {
         if (keysym == Clutter.Escape) {
             this.destroy();
         } else if (action == Meta.KeyBindingAction.SWITCH_GROUP) {
-			this.selectThumbnail(SELECT_NEXT, this.currentThumbnailIndex);
+            this.selectThumbnail(SELECT_NEXT, this.currentThumbnailIndex, false);
         } else if (action == Meta.KeyBindingAction.SWITCH_GROUP_BACKWARD) {
-			this.selectThumbnail(SELECT_PREV, this.currentThumbnailIndex);
+            this.selectThumbnail(SELECT_PREV, this.currentThumbnailIndex, false);
         } else if (action == Meta.KeyBindingAction.SWITCH_WINDOWS) {
-			this.selectThumbnail(SELECT_NEXT, this.currentThumbnailIndex);			
+            this.selectThumbnail(SELECT_NEXT, this.currentThumbnailIndex, false);
         } else if (action == Meta.KeyBindingAction.SWITCH_WINDOWS_BACKWARD) {
-			this.selectThumbnail(SELECT_PREV, this.currentThumbnailIndex);
+            this.selectThumbnail(SELECT_PREV, this.currentThumbnailIndex, false);
         } else if (keysym == Clutter.Left) {
-			this.selectThumbnail(SELECT_PREV, this.currentThumbnailIndex);
-		} else if (keysym == Clutter.Right) {
-			this.selectThumbnail(SELECT_NEXT, this.currentThumbnailIndex);			
-		} else if (keysym == Clutter.Up) {
-			let prevRowIndex = this.getPrevRowIndex();
-			this.selectThumbnail(SELECT_KEEP, prevRowIndex);
-		} else if (keysym == Clutter.Down) {
-			let nextRowIndex = this.getNextRowIndex();
-			this.selectThumbnail(SELECT_KEEP, nextRowIndex);
-		} else if (keysym == Clutter.Home) {
-			this.selectThumbnail(SELECT_KEEP, 0);
-		} else if (keysym == Clutter.End) {
-			this.selectThumbnail(SELECT_KEEP, this.thumbnailNum - 1);
-		}
+            this.selectThumbnail(SELECT_PREV, this.currentThumbnailIndex, false);
+        } else if (keysym == Clutter.Right) {
+            this.selectThumbnail(SELECT_NEXT, this.currentThumbnailIndex, false);
+        } else if (keysym == Clutter.Up) {
+            let prevRowIndex = this.getPrevRowIndex();
+            this.selectThumbnail(SELECT_KEEP, prevRowIndex, false);
+        } else if (keysym == Clutter.Down) {
+            let nextRowIndex = this.getNextRowIndex();
+            this.selectThumbnail(SELECT_KEEP, nextRowIndex, false);
+        } else if (keysym == Clutter.Home) {
+            this.selectThumbnail(SELECT_KEEP, 0, false);
+        } else if (keysym == Clutter.End) {
+            this.selectThumbnail(SELECT_KEEP, this.thumbnailNum - 1, false);
+        }
 
-		this.actor.show();
+        this.actor.show();
 
         return true;
     },
 
-	getNextRowIndex: function() {
-		let nextIndex = this.currentThumbnailIndex + this.thumbnailColumns;
-		
-		if (nextIndex <= this.thumbnailNum - 1) {
-			return nextIndex;
-		} else {
-			let nextRow = Math.floor(nextIndex / this.thumbnailColumns);
-			let maxRow = Math.floor((this.thumbnailNum - 1) / this.thumbnailColumns);
-			
-			if (nextRow == maxRow) {
-				return this.thumbnailNum - 1;
-			} else {
-				return nextIndex - ((maxRow + 1) * this.thumbnailColumns);
-			}
-		}
-	},
+    getNextRowIndex: function() {
+        let nextIndex = this.currentThumbnailIndex + this.thumbnailColumns;
 
-	getPrevRowIndex: function() {
-		let prevIndex = this.currentThumbnailIndex - this.thumbnailColumns;
-		if (prevIndex >= 0) {
-			return prevIndex;
-		} else {
-			let maxRow = Math.floor((this.thumbnailNum - 1) / this.thumbnailColumns);
-			prevIndex += (maxRow + 1) * this.thumbnailColumns;
-			if (prevIndex > this.thumbnailNum - 1) {
-				return this.thumbnailNum - 1;
-			} else {
-				return prevIndex;
-			}
-		}
-	},
+        if (nextIndex <= this.thumbnailNum - 1) {
+            return nextIndex;
+        } else {
+            let nextRow = Math.floor(nextIndex / this.thumbnailColumns);
+            let maxRow = Math.floor((this.thumbnailNum - 1) / this.thumbnailColumns);
 
-    selectThumbnail: function(selectType, index) {
-		global.log("Got it!");
-		
-        // Init.
-        let thumbnailNum = this.windows.length + this.workspaces.length;
-		
-        // Unselect current thumbnail.
-        let currentThumbnail = this.getThumbnailByIndex(this.currentThumbnailIndex);
-        if (currentThumbnail) {
-            currentThumbnail.unselect();
-        }
-
-        // Select target thumbnail.
-		let targetIndex = 0;
-        if (selectType == SELECT_KEEP) {
-            targetIndex = index;
-        } else if (selectType == SELECT_NEXT) {
-            if (index >= 0 && index < thumbnailNum - 1) {
-                targetIndex = index + 1;
+            if (nextRow == maxRow) {
+                return this.thumbnailNum - 1;
             } else {
-                targetIndex = 0;
-            }
-        } else if (selectType == SELECT_PREV) {
-			if (index == 0) {
-				targetIndex = thumbnailNum - 1;
-			} else if (index > 0 && index < thumbnailNum) {
-                targetIndex = index - 1;
-            } else {
-                targetIndex = 0;
+                return nextIndex - ((maxRow + 1) * this.thumbnailColumns);
             }
         }
+    },
 
-        let targetThumbnail = this.getThumbnailByIndex(targetIndex);
-        if (targetThumbnail) {
-            targetThumbnail.select();
-			this.currentThumbnailIndex = targetIndex;
+    getPrevRowIndex: function() {
+        let prevIndex = this.currentThumbnailIndex - this.thumbnailColumns;
+        if (prevIndex >= 0) {
+            return prevIndex;
+        } else {
+            let maxRow = Math.floor((this.thumbnailNum - 1) / this.thumbnailColumns);
+            prevIndex += (maxRow + 1) * this.thumbnailColumns;
+            if (prevIndex > this.thumbnailNum - 1) {
+                return this.thumbnailNum - 1;
+            } else {
+                return prevIndex;
+            }
         }
-		
-		global.log("Select finish");
+    },
+
+    selectThumbnail: function(selectType, index, mouseHover) {
+        if (!mouseHover || this.enableHoverFlag) {
+            // Init.
+            let thumbnailNum = this.windows.length + this.workspaces.length;
+
+            // Unselect current thumbnail.
+            let currentThumbnail = this.getThumbnailByIndex(this.currentThumbnailIndex);
+            if (currentThumbnail) {
+                currentThumbnail.unselect();
+            }
+
+            // Select target thumbnail.
+            let targetIndex = 0;
+            if (selectType == SELECT_KEEP) {
+                targetIndex = index;
+            } else if (selectType == SELECT_NEXT) {
+                if (index >= 0 && index < thumbnailNum - 1) {
+                    targetIndex = index + 1;
+                } else {
+                    targetIndex = 0;
+                }
+            } else if (selectType == SELECT_PREV) {
+                if (index == 0) {
+                    targetIndex = thumbnailNum - 1;
+                } else if (index > 0 && index < thumbnailNum) {
+                    targetIndex = index - 1;
+                } else {
+                    targetIndex = 0;
+                }
+            }
+
+            let targetThumbnail = this.getThumbnailByIndex(targetIndex);
+            if (targetThumbnail) {
+                targetThumbnail.select();
+                this.currentThumbnailIndex = targetIndex;
+            }
+        }
     },
 
     getThumbnailByIndex: function(index) {
