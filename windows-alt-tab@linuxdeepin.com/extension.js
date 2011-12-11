@@ -503,7 +503,16 @@ SwitchPopupWindow.prototype = {
             this.selectThumbnail(SELECT_KEEP, 0, false);
         } else if (keysym == Clutter.End) {
             this.selectThumbnail(SELECT_KEEP, this.thumbnailNum - 1, false);
-        }
+        } else {
+			let numKey = keysym - Clutter.KEY_0;
+			if (numKey > 0 && numKey < 10) {
+				for (let i = 0; i < this.workspaces.length; i++) {
+					if (numKey == this.workspaces[i].window.get_workspace().index() + 1) {
+						this.selectThumbnail(SELECT_KEEP, this.windows.length + i, false);
+					}
+				}
+			}
+		}
 
         this.actor.show();
 
