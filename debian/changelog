@@ -1,4 +1,10 @@
-deepin-gse (1.0.4) oneiric; urgency=low
+deepin-gse (1.0.5-1) oneiric; urgency=low
+
+  * Import user-theme extension from gnome-shell-extensions
+
+ -- Zhang Cheng <zhangcheng@linuxdeepin.com>  Mon, 12 Dec 2011 12:25:53 +0800
+
+deepin-gse (1.0.4-1) oneiric; urgency=low
 
   * Remove smart overview extension
   * Add show desktop extension
