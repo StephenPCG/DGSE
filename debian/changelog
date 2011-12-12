@@ -1,3 +1,10 @@
+deepin-gse (1.0.7-1) oneiric; urgency=low
+
+  * Rename uuid of user-theme to original, so it will not bother
+    gnome-tweak-tool
+
+ -- Zhang Cheng <zhangcheng@linuxdeepin.com>  Mon, 12 Dec 2011 18:20:06 +0800
+
 deepin-gse (1.0.6-1) oneiric; urgency=low
 
   * Update debian/rules to install po/ for system-monitor extension
