@@ -16,7 +16,7 @@
       <description>Sets the position of the dock in the screen. Allowed values are 'right' or 'left'</description>
     </key>
     <key name="size" type="i">
-      <default>48</default>
+      <default>32</default>
       <summary>Icon size</summary>
       <description>Sets icon size of the dock.</description>
     </key>
@@ -25,7 +25,7 @@
       <summary>Enable/disable autohide</summary>
     </key>
     <key name="hide-effect" enum="org.gnome.shell.extensions.dock.AutoHideEffect">
-      <default>'resize'</default>
+      <default>'move'</default>
       <summary>Autohide effect</summary>
       <description>Sets the effect of the hide dock. Allowed values are 'resize' or 'rescale'</description>
     </key>
