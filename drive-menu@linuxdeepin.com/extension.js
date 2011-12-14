@@ -62,6 +62,8 @@ DriveMenu.prototype = {
 
         this._contentSection = new PopupMenu.PopupMenuSection();
         this.menu.addMenuItem(this._contentSection);
+		this.menu._arrowAlignment = 0.5;
+		this.menu._arrowSide = St.Side.TOP;
 
         this._update();
 
