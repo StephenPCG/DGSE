@@ -1,14 +1,9 @@
  /* Panel */
 .dock-app {
-    padding: 4px;
-    width: 70px;
-    height: 70px;        
-    border-radius: 2px;
     transition-duration: 100;
 }
 
 .dock-app.running {
-    padding: 3px;
 	border: 1px solid rgba(0,0,0,0.4);
 	background-gradient-direction: vertical;
 	background-gradient-start: rgba(255,255,255,0.8);
@@ -18,7 +13,6 @@
 }
 
 .dock-app.selected {
-    padding: 3px;
 	border: 1px solid rgba(0,0,0,0.4);
 	background-gradient-direction: vertical;
 	background-gradient-start: rgba(0,255,255,0.5);
@@ -28,7 +22,6 @@
 }
 
 .dock-app.focused {
-    padding: 3px;
 	border: 1px solid rgba(0,0,0,0.4);
 	background-gradient-direction: vertical;
 	background-gradient-start: rgba(66,255,42,0.6);
@@ -38,7 +31,6 @@
 }
 
 .dock-app:hover {
-    padding: 3px;
 	border: 1px solid rgba(0,0,0,0.4);
 	background-gradient-direction: vertical;
 	background-gradient-start: rgba(255,255,255,0.2);
@@ -48,7 +40,6 @@
 }
 
 .dock-app:active {
-    padding: 3px;
 	border: 1px solid rgba(0,0,0,0.4);
 	background-gradient-direction: vertical;
 	background-gradient-start: rgba(255,0,255,0.5);
@@ -59,4 +50,48 @@
 
 .dock-menu {
     font-size: 12px
+}
+
+.dock-thumbnail-icon {
+	padding: 10px 10px 10px 10px;
+	border-radius: 4px;
+	border: 1px solid rgba(255,255,255,0);
+}
+
+.dock-thumbnail-icon:windowSelected {
+	background-gradient-direction: vertical;
+	background-gradient-start: rgba(255,255,255,0.3);
+	background-gradient-end: rgba(255,255,255,0.5);
+	border-radius: 4px;
+	border: 1px solid rgba(0,0,0,0.4);
+	color: rgba(0,0,0,0.8);
+    box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.4); 
+}
+
+.dock-thumbnail-icon:workspaceSelected {
+	background-gradient-direction: vertical;
+	background-gradient-start: rgba(0,255,0,0.3);
+	background-gradient-end: rgba(0,255,0,0.5);
+	border-radius: 4px;
+	border: 1px solid rgba(0,0,0,0.4);
+	color: rgba(0,0,0,0.8);
+    box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.4); 
+}
+
+.dock-thumbnail-window {
+	padding: 10px 20px 10px 10px;
+	background-gradient-direction: vertical;
+	background-gradient-start: rgba(255,255,255,0.4);
+	background-gradient-end: rgba(255,255,255,0.3);
+	box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.2);
+	border: 1px solid rgba(0,0,0,0.4);
+	border-radius: 4px;
+	color: rgba(0,0,0,0.8);
+}
+
+.dock-thumbnail-icon-font {
+	color: rgba(0,0,0,0.8);
+	font-weight: normal;
+	font-size: 15px;
+	text-shadow: rgba(255,255,255,0.3) 0px 1px 0px;
 }
