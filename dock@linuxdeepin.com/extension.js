@@ -16,7 +16,8 @@ const AppFavorites = imports.ui.appFavorites;
 const DND = imports.ui.dnd;
 const Main = imports.ui.main;
 const Overview = imports.ui.overview;
-const PopupMenu = imports.ui.popupMenu;
+const Extension = imports.ui.extensionSystem.extensions['dock@linuxdeepin.com'];
+const PopupMenu = Extension.popupMenu;
 const Search = imports.ui.search;
 const Tweener = imports.ui.tweener;
 const Workspace = imports.ui.workspace;
@@ -211,19 +212,14 @@ DockIcon.prototype = {
         this.actor = new St.Button({ style_class: 'dock-app',
                                      button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
                                      reactive: true,
-									 can_focus: true,
+                                     can_focus: true,
                                      x_fill: false,
                                      y_fill: false,
-									 track_hover: true});
+                                     track_hover: true});
         this.actor._delegate = this;
         this.actor.set_size(dockFrameWidth, dockFrameHeight);
-		
-        // this._iconBin = new St.Bin({ x_fill: false, y_fill: false });
-		// this._iconBin.set_size(dockIconSize, dockIconSize);
-		// this.actor.set_child(this._iconBin);
 
         this._icon = this.app.create_icon_texture(dockIconSize);
-		// this._iconBin.set_child(this._icon);
         this.actor.set_child(this._icon);
 
         this.actor.connect('clicked', Lang.bind(this, this._onClicked));
@@ -239,23 +235,23 @@ DockIcon.prototype = {
         this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
         this.actor.connect('destroy', Lang.bind(this, this._onDestroy));
         this.actor.connect('notify::hover', Lang.bind(this, this._hoverChanged));
-		
+
         this._menuTimeoutId = 0;
         this._stateChangedId = this.app.connect('notify::state',
                                                 Lang.bind(this, this._onStateChanged));
         this._onStateChanged();
         this._dock=dock;
-		
-		this.hasHoverMenu = false;
-    },
-	
-	enableHoverMenu: function() {
-		this.hasHoverMenu = true;
-	},
 
-	disableHoverMenu: function() {
-		this.hasHoverMenu = false;
-	},
+        this.hasHoverMenu = false;
+    },
+
+    enableHoverMenu: function() {
+        this.hasHoverMenu = true;
+    },
+
+    disableHoverMenu: function() {
+        this.hasHoverMenu = false;
+    },
 
     _onDestroy: function() {
         if (this._stateChangedId > 0)
@@ -272,25 +268,24 @@ DockIcon.prototype = {
     },
 
     _hoverChanged: function(actor) {
-		global.log("hover");
-		
+        global.log("hover");
+
         if (actor != this.actor)
             this._has_focus = false;
         else
             this._has_focus = true;
-		
-		let windows = this.app.get_windows();
-		if (windows.length >= 1 && !this.hasHoverMenu) {
-			global.log(this._has_focus);
-			let thumbnailMenu = new AppThumbnailHoverMenu(this, this.actor, windows[0], this.app);
-			// thumbnailMenu.open();
-			new HoverMenuController(this.actor, thumbnailMenu, this.disableHoverMenu);
-			
-			global.log("Got it");
-			
-			this.enableHoverMenu();
-		}
-		
+
+        let windows = this.app.get_windows();
+        if (windows.length >= 1 && !this.hasHoverMenu) {
+            global.log(this._has_focus);
+            let thumbnailMenu = new AppThumbnailHoverMenu(this, this.actor, windows[0], this.app);
+            new HoverMenuController(this.actor, thumbnailMenu, this.disableHoverMenu);
+
+            global.log("Got it");
+
+            this.enableHoverMenu();
+        }
+
         return false;
     },
 
@@ -448,21 +443,17 @@ DockThumbnail.prototype = {
         this.actorBox.add(this._iconBin, { x_fill: true, y_fill: true } );
 
         let title = window.get_title();
-        if (title) {
-            this.label = new St.Label(
-                {style_class: 'dock-thumbnail-icon-font',
-                 text: title });
-            let bin = new St.Bin({ x_align: St.Align.MIDDLE});
-            bin.add_actor(this.label);
-            this.actorBox.add(bin);
-        } else {
-            this.label = new St.Label(
-                {style_class: 'dock-thumbnail-icon-font',
-                 text: this.app.get_name() });
-            let bin = new St.Bin({ x_align: St.Align.MIDDLE });
-            bin.add_actor(this.label);
-            this.actorBox.add(bin);
+        let labelText;
+        if (!title) {
+            title = this.app.get_name();
         }
+        this.label = new St.Label(
+            {style_class: 'dock-thumbnail-icon-font',
+             text: title });
+        let bin = new St.Bin({x_align: St.Align.MIDDLE});
+        bin.add_actor(this.label);
+        bin.set_width(width);
+        this.actorBox.add(bin);
     },
 
     select: function() {
@@ -516,7 +507,7 @@ DockIconMenu.prototype = {
     __proto__: AppDisplay.AppIconMenu.prototype,
 
     _init: function(source) {
-        PopupMenu.PopupMenu.prototype._init.call(this, source.actor, 0.5, St.Side.LEFT, 0);
+        PopupMenu.PopupMenu.prototype._init.call(this, source.actor, 0.5, St.Side.TOP, 0);
 
         this._source = source;
 
@@ -593,37 +584,6 @@ DockIconMenu.prototype = {
     }
 };
 
-function RightClickPopupMenu() {
-    this._init.apply(this, arguments);
-}
-
-RightClickPopupMenu.prototype = {
-    __proto__: PopupMenu.PopupMenu.prototype,
-
-    _init: function(actor, params) {
-        // openOnButton: which button opens the menu
-        params = Params.parse(params, { openOnButton: 3 });
-        
-        PopupMenu.PopupMenu.prototype._init.call(this, actor, 0, St.Side.TOP);
-        
-        this.openOnButton = params.openOnButton;
-        this._parentActor = actor;
-        this._parentActor.connect('button-release-event', Lang.bind(this, this._onParentActorButtonRelease));
-        
-        this.actor.hide();
-        Main.uiGroup.add_actor(this.actor);
-    },
-
-    _onParentActorButtonRelease: function(actor, event) {
-        let buttonMask = Clutter.ModifierType['BUTTON' + this.openOnButton + '_MASK'];
-        if (Shell.get_event_state(event) & buttonMask) {
-            this.toggle();
-        }
-        
-    }
-};
-
-
 function HoverMenuController() {
     this._init.apply(this, arguments);
 }
@@ -636,10 +596,10 @@ HoverMenuController.prototype = {
         params = Params.parse(params, { reactive: true,
                                         clickShouldImpede: true,
                                         clickShouldClose: true });
-        
+
         this._parentActor = actor;
         this._parentMenu = menu;
-		this.closeCallback = closeCallback;
+        this.closeCallback = closeCallback;
 
         this._parentActor.reactive = true;
         this._parentActor.connect('enter-event', Lang.bind(this, this._onEnter));
@@ -679,7 +639,7 @@ HoverMenuController.prototype = {
     _onParentMenuLeave: function() {
         this.shouldClose = true;
 
-		this.close();
+        this.close();
     },
 
     _onEnter: function() {
@@ -688,7 +648,7 @@ HoverMenuController.prototype = {
         }
         this.shouldClose = false;
 
-		this.open();
+        this.open();
     },
 
     _onLeave: function() {
@@ -697,7 +657,7 @@ HoverMenuController.prototype = {
         }
         this.shouldOpen = false;
 
-		this.close();
+        this.close();
     },
 
     open: function() {
@@ -709,7 +669,7 @@ HoverMenuController.prototype = {
     close: function() {
         if (this.shouldClose) {
             this._parentMenu.close(true);
-			this.closeCallback();
+            this.closeCallback();
         }
     },
 
@@ -730,14 +690,14 @@ HoverMenu.prototype = {
     __proto__: PopupMenu.PopupMenu.prototype,
 
     _init: function(actor, params) {
-        PopupMenu.PopupMenu.prototype._init.call(this, actor, St.Align.MIDDLE, St.Side.TOP);
+        PopupMenu.PopupMenu.prototype._init.call(this, actor, 0.5, St.Side.TOP);
 
         params = Params.parse(params, { reactive: true });
 
         this._parentActor = actor;
 
         this.actor.hide();
-        
+
         if (params.reactive) {
             Main.layoutManager.addChrome(this.actor);
         } else {
@@ -756,11 +716,11 @@ AppThumbnailHoverMenu.prototype = {
     _init: function(source, actor, metaWindow, app) {
         HoverMenu.prototype._init.call(this, actor, { reactive: true });
 
-		this.source = source;
+        this.source = source;
         this.metaWindow = metaWindow;
         this.app = app;
-		
-        this.appSwitcherItem = new PopupMenuAppSwitcherItem(source, this.metaWindow, this.app);
+
+        this.appSwitcherItem = new PopupMenuAppSwitcherItem(this, source, this.metaWindow, this.app);
         this.addMenuItem(this.appSwitcherItem);
     },
 
@@ -768,98 +728,8 @@ AppThumbnailHoverMenu.prototype = {
         this.appSwitcherItem._refresh();
         PopupMenu.PopupMenu.prototype.open.call(this);
     }
-	
-	
-};
 
-function RightClickAppPopupMenu() {
-    this._init.apply(this, arguments);
-}
 
-RightClickAppPopupMenu.prototype = {
-    __proto__: RightClickPopupMenu.prototype,
-
-    _init: function(actor, metaWindow, app, params) {
-        RightClickPopupMenu.prototype._init.call(this, actor, params);
-        
-        this.metaWindow = metaWindow;
-        this.app = app;
-
-        this._menuItemName = new PopupMenu.PopupMenuItem(this.app.get_name(), { reactive: false });
-        this.addMenuItem(this._menuItemName);
-
-        this.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-
-        this._menuItemCloseWindow = new PopupMenu.PopupMenuItem('Close');
-        this._menuItemCloseWindow.connect('activate', Lang.bind(this, this._onMenuItemCloseWindowActivate));
-        this.addMenuItem(this._menuItemCloseWindow);
-        this._menuItemMinimizeWindow = new PopupMenu.PopupMenuItem('Minimize');
-        this._menuItemMinimizeWindow.connect('activate', Lang.bind(this, this._onMenuItemMinimizeWindowActivate));
-        this.addMenuItem(this._menuItemMinimizeWindow);
-        this._menuItemMaximizeWindow = new PopupMenu.PopupMenuItem('Maximize');
-        this._menuItemMaximizeWindow.connect('activate', Lang.bind(this, this._onMenuItemMaximizeWindowActivate));
-        this.addMenuItem(this._menuItemMaximizeWindow);
-    },
-
-    _onMenuItemMaximizeWindowActivate: function() {
-        //causes gnome-shell 3.0.2 to crash
-        //this.metaWindow.maximize(true);
-    },
-
-    _onMenuItemMinimizeWindowActivate: function() {
-        this.metaWindow.minimize(global.get_current_time());
-    },
-
-    _onMenuItemCloseWindowActivate: function() {
-        this.app.request_quit();
-    },
-
-    open: function(animate) {
-        // Dynamically generate the thumbnail when we open the menu since
-        // when extensions first load, the thumbnail is unavailable
-        this.generateThumbnail();
-        RightClickPopupMenu.prototype.open.call(this);
-    },
-
-    generateThumbnail: function() {
-        // If we already made a thumbnail, we don't need to make it again
-        if (this.thumbnail) {
-            return;
-        }
-
-        // Get a pretty thumbnail of our app
-        let mutterWindow = this.metaWindow.get_compositor_private();
-        if (mutterWindow) {
-            let windowTexture = mutterWindow.get_texture();
-            let [width, height] = windowTexture.get_size();
-            let scale = Math.min(1.0, THUMBNAIL_DEFAULT_SIZE / width, THUMBNAIL_DEFAULT_SIZE / height);
-            this.thumbnail = new Clutter.Clone ({ source: windowTexture,
-                                                  reactive: true,
-                                                  width: width * scale,
-                                                  height: height * scale });
-
-            this.thumnailMenuItem = new PopupMenuThumbnailItem(this.thumbnail);
-            this.addMenuItem(this.thumnailMenuItem);
-            this.thumnailMenuItem.connect('activate', Lang.bind(this, function() {
-                this.metaWindow.activate(global.get_current_time());
-            }));
-        }
-    }
-};
-
-function PopupMenuThumbnailItem() {
-    this._init.apply(this, arguments);
-}
-
-PopupMenuThumbnailItem.prototype = {
-    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
-
-    _init: function (image, params) {
-        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
-
-        this.image = image;
-        this.addActor(this.image);
-    }
 };
 
 // display a list of app thumbnails and allow
@@ -871,118 +741,92 @@ function PopupMenuAppSwitcherItem() {
 PopupMenuAppSwitcherItem.prototype = {
     __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-    _init: function (source, metaWindow, app, params) {
+    _init: function (menu, source, metaWindow, app, params) {
         params = Params.parse(params, { hover: false });
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
-        
-		this.source = source;
-        this.app = app;
-        
-        this.appContainer = new St.BoxLayout({ style_class: 'app-window-switcher',
-                                               reactive: true,
-                                               track_hover: true,
-                                               can_focus: true,
-                                               vertical: false });
 
+		
+        let primary = Main.layoutManager.primaryMonitor;
+        this.monitorWidth = primary.width;
+        this.monitorHeight = primary.height;
+        this.windowWidth = this.monitorWidth * 3 / 4;
+        this.thumbnailBorder = 1;
+        this.thumbnailPaddingX = 10;
+        this.thumbnailPaddingY = 10;
+        this.thumbnailFontSize = 15;
+        this.windowPaddingX = 10;
+        this.windowPaddingUp = 10;
+        this.windowPaddingBottom = 20;
+        this.thumbnailColumns = 4;
+        this.thumbnailRows = 4;
+        this.thumbnailWidth = (this.windowWidth - (this.thumbnailColumns * (this.thumbnailPaddingX + this.thumbnailBorder) * 2) - this.windowPaddingX * 2) / this.thumbnailColumns;
+        this.thumbnailHeight = this.thumbnailWidth * (this.monitorHeight / this.monitorWidth);
+		
+        this.menu = menu;
+        this.source = source;
+        this.app = app;
+
+        this.appContainer = new St.Table();
+		
         this.addActor(this.appContainer);
     },
 
     _connectToWindowOpen: function(actor, metaWindow) {
         actor.connect('button-release-event', Lang.bind(this, function() {
-            metaWindow.activate(global.get_current_time());
-        }));
+                                                            metaWindow.activate(global.get_current_time());
+                                                        }));
     },
 
     _refresh: function() {
         this.appContainer.get_children().forEach(Lang.bind(this, function (child) {
-                                                        child.destroy();
-                                                    }));
-		let windows = this.app.get_windows();
-		for (let i = 0; i < windows.length; i++) {
-			let windowThumbnail = new WindowThumbnail(windows[i], this.app);
-			// let windowThumbnail = new DockThumbnail(this.app, windows[i], 160, 90);
-			this._connectToWindowOpen(windowThumbnail.actor, windows[i]);
-			this.appContainer.add_actor(windowThumbnail.actor);
+                                                               child.destroy();
+                                                           }));
+		
+        let windows = this.app.get_windows();
+		let maxWidth = 0;
+		let thumbnailNum = windows.length;
+		
+		for (let j = 0; j < windows.length; j++) {
+			let [winWidth, winHeight] = windows[j].get_compositor_private().get_texture().get_size();
+			if (winWidth > maxWidth) {
+				maxWidth = winWidth;
+			}
 		}
-    }
-};
-
-function WindowThumbnail() {
-    this._init.apply(this, arguments);
-}
-
-WindowThumbnail.prototype = {
-    _init: function (metaWindow, app, params) {
-        this.metaWindow = metaWindow;
-        this.app = app;
-
-        // Inherit the theme from the alt-tab menu
-        this.actor = new St.BoxLayout({ style_class: 'window-thumbnail',
-                                        reactive: true,
-                                        can_focus: true,
-                                        vertical: true });
-        this.thumbnailActor = new St.Bin({ y_fill: false,
-                                           y_align: St.Align.MIDDLE });
-        this.thumbnailActor.height = THUMBNAIL_DEFAULT_SIZE;
-        this.titleActor = new St.Label();
-        //TODO: should probably do this in a smarter way in the get_size_request event or something...
-        //fixing this should also allow the text to be centered
-        this.titleActor.width = THUMBNAIL_DEFAULT_SIZE;
-
-        this.actor.add(this.thumbnailActor);
-        this.actor.add(this.titleActor);
-        this._refresh();
-
-        // the thumbnail actor will automatically reflect changes in the window
-        // (since it is a clone), but we need to update the title when it changes
-        this.metaWindow.connect('notify::title', Lang.bind(this, function(){
-                                                    this.titleActor.text = this.metaWindow.get_title();
-                                }));
-        this.actor.connect('enter-event', Lang.bind(this, function() {
-                                                        this.actor.add_style_pseudo_class('hover');
-                                                        this.actor.add_style_pseudo_class('selected');
-                                                    }));
-        this.actor.connect('leave-event', Lang.bind(this, function() {
-                                                        this.actor.remove_style_pseudo_class('hover');
-                                                        this.actor.remove_style_pseudo_class('selected');
-                                                    }));
-    },
-
-    destroy: function() {
-        this.actor.destroy();
-    },
-
-    needs_refresh: function() {
-        return Boolean(this.thumbnail);
-    },
-
-    _getThumbnail: function() {
-        // Create our own thumbnail if it doesn't exist
-        if (this.thumbnail) {
-            return this.thumbnail;
+		
+		this.requestWidth = this.thumbnailWidth / this.monitorWidth * maxWidth;
+		this.requestHeight = this.thumbnailHeight;
+				
+		
+        let childBox = new Clutter.ActorBox();
+        let rows = Math.floor(thumbnailNum / this.thumbnailColumns) + (thumbnailNum % this.thumbnailColumns ? 1 : 0);
+        let windowWidth = 0;
+        if (thumbnailNum > this.thumbnailColumns) {
+            windowWidth = this.thumbnailColumns * this.requestWidth + this.thumbnailColumns * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.windowPaddingX * 2;
+        } else {
+            windowWidth = thumbnailNum * this.requestWidth + thumbnailNum * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.windowPaddingX * 2;
         }
+        let windowHeight = rows * this.requestHeight + rows * (this.thumbnailPaddingY + this.thumbnailBorder) * 2 + rows * this.thumbnailFontSize + this.windowPaddingUp + this.windowPaddingBottom;
+		let [iconX, iconY] = this.source.actor.get_transformed_position();
+		let windowOffsetX = iconX + windowWidth / 2;
+		let windowOffsetY = iconY;
+		this.menu.box.set_position(windowOffsetX, windowOffsetY);
+		this.menu.box.set_size(windowWidth, windowHeight);
 
-        let thumbnail = null;
-        let mutterWindow = this.metaWindow.get_compositor_private();
-        if (mutterWindow) {
-            let windowTexture = mutterWindow.get_texture();
-            let [width, height] = windowTexture.get_size();
-            let scale = Math.min(1.0, THUMBNAIL_DEFAULT_SIZE / width, THUMBNAIL_DEFAULT_SIZE / height);
-            thumbnail = new Clutter.Clone ({ source: windowTexture,
-                                             reactive: true,
-                                             width: width * scale,
-                                             height: height * scale });
-        }
-
-        return thumbnail;
-    },
-
-    _refresh: function() {
-        // Replace the old thumbnail
-        this.thumbnail = this._getThumbnail();
-        
-        this.thumbnailActor.child = this.thumbnail;
-        this.titleActor.text = this.metaWindow.get_title();
+        for (let i = 0; i < windows.length; i++) {
+            let index = i;
+            let iconRow = Math.floor(index / this.thumbnailColumns);
+            let iconColumn = index % this.thumbnailColumns;
+            let windowThumbnail = new DockThumbnail(
+				this.app, 
+				windows[i], 
+				this.requestWidth,
+				this.requestHeight);
+            this.appContainer.add(windowThumbnail.actor,
+								  {row: iconRow,
+								   col: iconColumn
+								  });
+            this._connectToWindowOpen(windowThumbnail.actor, windows[i]);
+		}
     }
 };
 
@@ -1016,4 +860,3 @@ function disable() {
     // Restore application menu.
     Main.panel._leftBox.insert_actor(appMenu.actor, 1);
 }
-
