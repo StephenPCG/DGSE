@@ -1,5 +1,5 @@
 {
- "uuid": "user-theme@linuxdeepin.com",
+ "uuid": "user-theme@gnome-shell-extensions.gnome.org",
  "name": "User Themes",
  "description": "Load shell themes from user directory",
  "shell-version": [ "3.2.0", "3.2" ],
