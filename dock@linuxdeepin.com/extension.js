@@ -41,6 +41,9 @@ let dockIconPaddingY;
 let activitiesButtonWidth;
 let appMenu;
 let dock;
+let dockThumbnailMenu = null;
+let dockTitleSize = 15;
+let closeButtonSize = 24;
 
 function Dock() {
     this._init.apply(this, arguments);
@@ -268,13 +271,20 @@ DockIcon.prototype = {
     },
 
     _hoverChanged: function(actor) {
-        let windows = this.app.get_windows();
-        if (windows.length >= 1 && !this.hasHoverMenu) {
-            let thumbnailMenu = new AppThumbnailHoverMenu(this);
-        }
+		this.popupThumbnailMenu();		
 
         return false;
     },
+	
+	popupThumbnailMenu: function() {
+        if (this.app.get_windows().length >= 1 && !this.hasHoverMenu) {
+            if (dockThumbnailMenu) {
+                dockThumbnailMenu.close();
+            }
+
+            dockThumbnailMenu = new AppThumbnailHoverMenu(this);
+        }
+	},
 
     _onStateChanged: function() {
         let tracker = Shell.WindowTracker.get_default();
@@ -322,7 +332,7 @@ DockIcon.prototype = {
     getId: function() {
         return this.app.get_id();
     },
-
+	
     popupMenu: function() {
         this._removeMenuTimeout();
         this.actor.fake_release();
@@ -407,10 +417,11 @@ function DockThumbnail() {
 }
 
 DockThumbnail.prototype = {
-    _init : function(app, window, width, height, menu) {
+    _init : function(app, window, width, height, menu, closeWindowCallback) {
         this.app = app;
         this.window = window;
-		this.menu = menu;
+        this.menu = menu;
+        this.closeWindowCallback = closeWindowCallback;
 
         this.highlighted = false;
 
@@ -419,25 +430,21 @@ DockThumbnail.prototype = {
                                     can_focus: true});
 
         this.actorBox = new St.BoxLayout({vertical: true,
-										  reactive: true,
+                                          reactive: true,
                                           can_focus: true});
-		this.actorBox.connect('enter-event', Lang.bind(this, this.select));
-		this.actorBox.connect('leave-event', Lang.bind(this, this.unselect));
-		this.actor.connect(
-			'clicked', 
-			Lang.bind(this, function() {
-						  Main.activateWindow(this.window);
-						  this.menu.close();
-					  }));
+        this.actorBox.connect('enter-event', Lang.bind(this, this.select));
+        this.actorBox.connect('leave-event', Lang.bind(this, this.unselect));
+        this.actor.connect(
+            'clicked',
+            Lang.bind(this, function() {
+                          Main.activateWindow(this.window);
+                          this.menu.close();
+                      }));
         this.actor.set_child(this.actorBox);
 
-        this.icon = null;
-        this._iconBin = new St.Bin({ x_fill: true, y_fill: true });
-        this.iconWidth = width;
-        this.iconHeight = height;
-        this.set_size(this.iconWidth, this.iconHeight);
-
-        this.actorBox.add(this._iconBin, { x_fill: true, y_fill: true } );
+        // Add window title.
+        this.hbox = new St.BoxLayout();
+        this.actorBox.add(this.hbox, {x_fill: true});
 
         let title = window.get_title();
         let labelText;
@@ -447,15 +454,37 @@ DockThumbnail.prototype = {
         this.label = new St.Label(
             {style_class: 'dock-thumbnail-icon-font',
              text: title });
-        let bin = new St.Bin({x_align: St.Align.MIDDLE});
+        let bin = new St.Bin({x_align: St.Align.START});
         bin.add_actor(this.label);
-        bin.set_width(width);
-        this.actorBox.add(bin);
+        this.hbox.add(bin, {expand: true});
+		this.hbox.set_width(width);
+
+        // Add window close button.
+        this.closeButton = new St.Button({ style_class: 'window-close' });
+        this.closeBin = new St.Bin({x_fill: true, x_align: St.Align.END, y_align: St.Align.START});
+        this.closeBin.child = this.closeButton;
+		this.closeBin.set_size(closeButtonSize, closeButtonSize);
+        this.hbox.add(this.closeBin);
+        this.closeButton.hide(); // hide close button default
+        this.closeButton.connect(
+            'clicked',
+            Lang.bind(this, function() {
+                          this.closeWindowCallback(this.window);
+                      }));
+
+        // Add window thumbnail.
+        this.icon = null;
+        this._iconBin = new St.Bin({ x_fill: true, y_fill: true });
+        this.iconWidth = width;
+        this.iconHeight = height;
+        this.set_size(this.iconWidth, this.iconHeight);
+        this.actorBox.add(this._iconBin, { x_fill: true, y_fill: true } );
     },
 
     select: function() {
         if (!this.highlighted) {
             this.actor.add_style_pseudo_class('hover');
+            this.closeButton.show();
             this.highlighted = true;
         }
     },
@@ -463,6 +492,7 @@ DockThumbnail.prototype = {
     unselect: function() {
         if (this.highlighted) {
             this.actor.remove_style_pseudo_class('hover');
+            this.closeButton.hide();
             this.highlighted = false;
         }
     },
@@ -602,7 +632,7 @@ AppThumbnailHoverMenu.prototype = {
 
         this.appSwitcherItem = new PopupMenuAppSwitcherItem(this, dockIcon);
         this.addMenuItem(this.appSwitcherItem);
-		
+
         this.closeFlag = false;
 
         this.dockIcon.actor.reactive = true;
@@ -619,17 +649,13 @@ AppThumbnailHoverMenu.prototype = {
     },
 
     close: function(animate) {
-		global.log("start");
-		
-		this.dockIcon.disableHoverMenu();
+        this.dockIcon.disableHoverMenu();
         PopupMenu.PopupMenu.prototype.close.call(this, animate);
-		
-		global.log("end");
     },
 
     openMenu: function() {
         if (!this.isOpen) {
-			this.dockIcon.enableHoverMenu();
+            this.dockIcon.enableHoverMenu();
             this.open(true);
         }
     },
@@ -683,8 +709,8 @@ PopupMenuAppSwitcherItem.prototype = {
         this.thumbnailBorder = 1;
         this.thumbnailPaddingX = 10;
         this.thumbnailPaddingY = 10;
-        this.thumbnailFontSize = 15;
-        this.thumbnailWidth = this.thumbnailWindowWidth / 6;
+        this.thumbnailFontSize = Math.max(closeButtonSize, dockTitleSize);
+        this.thumbnailWidth = this.thumbnailWindowWidth / 5;
         this.thumbnailHeight = this.thumbnailWidth * (this.monitorHeight / this.monitorWidth);
 
         // Those attributes need calculate dynamically.
@@ -697,17 +723,34 @@ PopupMenuAppSwitcherItem.prototype = {
         this.menu = menu;
         this.dockIcon = dockIcon;
         this.app = dockIcon.app;
+		this.thumbnails = {};
 
         this.appContainer = new St.Table();
 
         this.addActor(this.appContainer);
     },
 
+    closeWindow: function(window) {
+        window.delete(global.get_current_time());
+		this._refresh();
+		this.menu.removeAll();
+		this.menu.addMenuItem(this);
+		
+		// if (this.thumbnails[window]) {
+		// 	this.appContainer.remove(this.thumbnails[window].actor);
+		// }
+        // this._refresh();
+        // this.menu.queue_relayout();
+
+        global.log(window.get_title());
+    },
+
     _refresh: function() {
         this.appContainer.get_children().forEach(
-			Lang.bind(this, function (child) {
-						  child.destroy();
+            Lang.bind(this, function (child) {
+                          child.destroy();
                       }));
+		this.thumbnails = {};
 
         let windows = this.app.get_windows();
         let maxWidth = 0;
@@ -755,11 +798,13 @@ PopupMenuAppSwitcherItem.prototype = {
                 windows[i],
                 this.requestWidth,
                 this.requestHeight,
-				this.menu);
+                this.menu,
+                this.closeWindow);
             this.appContainer.add(windowThumbnail.actor,
                                   {row: iconRow,
                                    col: iconColumn
                                   });
+			this.thumbnails[windows[i]] = windowThumbnail;
         }
     }
 };
