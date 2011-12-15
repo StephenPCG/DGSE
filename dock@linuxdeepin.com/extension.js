@@ -270,9 +270,7 @@ DockIcon.prototype = {
     _hoverChanged: function(actor) {
         let windows = this.app.get_windows();
         if (windows.length >= 1 && !this.hasHoverMenu) {
-            let thumbnailMenu = new AppThumbnailHoverMenu(this, this.actor, windows[0], this.app, this.disableHoverMenu);
-
-            this.enableHoverMenu();
+            let thumbnailMenu = new AppThumbnailHoverMenu(this);
         }
 
         return false;
@@ -595,22 +593,21 @@ function AppThumbnailHoverMenu() {
 AppThumbnailHoverMenu.prototype = {
     __proto__: HoverMenu.prototype,
 
-    _init: function(source, actor, metaWindow, app, closeCallback) {
-        HoverMenu.prototype._init.call(this, actor, { reactive: true });
+    _init: function(dockIcon) {
+        HoverMenu.prototype._init.call(this, dockIcon.actor, { reactive: true });
 
-        this.source = source;
-        this.metaWindow = metaWindow;
-        this.app = app;
-        this.closeCallback = closeCallback;
+        this.dockIcon = dockIcon;
+        this.app = dockIcon.app;
+        this.metaWindow = this.app.get_windows()[0];
 
-        this.appSwitcherItem = new PopupMenuAppSwitcherItem(this, source, this.metaWindow, this.app);
+        this.appSwitcherItem = new PopupMenuAppSwitcherItem(this, dockIcon, this.metaWindow, this.app);
         this.addMenuItem(this.appSwitcherItem);
 		
         this.closeFlag = false;
 
-        this.source.actor.reactive = true;
-        this.source.actor.connect('enter-event', Lang.bind(this, this.openMenu));
-        this.source.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+        this.dockIcon.actor.reactive = true;
+        this.dockIcon.actor.connect('enter-event', Lang.bind(this, this.openMenu));
+        this.dockIcon.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
 
         this.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
         this.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
@@ -622,12 +619,13 @@ AppThumbnailHoverMenu.prototype = {
     },
 
     close: function() {
-        this.closeCallback();
+		this.dockIcon.disableHoverMenu();
         PopupMenu.PopupMenu.prototype.close.call(this);
     },
 
     openMenu: function() {
         if (!this.isOpen) {
+			this.dockIcon.enableHoverMenu();
             this.open(true);
         }
     },
