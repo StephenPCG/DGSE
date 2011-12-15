@@ -1,6 +1,6 @@
 /* Panel */
 .dock-app {
-    transition-duration: 100;
+    transition-duration: 200;
 }
 
 .dock-app.running {

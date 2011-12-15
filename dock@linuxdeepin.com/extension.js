@@ -28,6 +28,7 @@ const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 
 const THUMBNAIL_DEFAULT_SIZE = 150;
+const THUMBNAIL_DISAPPEAR_TIMEOUT = 500; // milliseconds
 
 //hide
 let dockIconSize;
@@ -280,6 +281,9 @@ DockIcon.prototype = {
             global.log(this._has_focus);
             let thumbnailMenu = new AppThumbnailHoverMenu(this, this.actor, windows[0], this.app);
             new HoverMenuController(this.actor, thumbnailMenu, this.disableHoverMenu);
+			
+			// this._menuManager.addMenu(thumbnailMenu, true);
+			// thumbnailMenu.open();
 
             global.log("Got it");
 
@@ -589,97 +593,49 @@ function HoverMenuController() {
 }
 
 HoverMenuController.prototype = {
-    _init: function(actor, menu, params, closeCallback) {
-        // reactive: should the menu stay open if your mouse is above the menu
-        // clickShouldImpede: if you click actor, should the menu be prevented from opening
-        // clickShouldClose: if you click actor, should the menu close
-        params = Params.parse(params, { reactive: true,
-                                        clickShouldImpede: true,
-                                        clickShouldClose: true });
+    _init: function(dockIcon, menu, closeCallback) {
+		this.dockIcon = dockIcon;
+		this.menu = menu;
+		this.closeCallback = closeCallback;
+		this.closeFlag = false;
+		
+		this.dockIcon.reactive = true;
+		this.dockIcon.connect('enter-event', Lang.bind(this, this.openMenu));
+		this.dockIcon.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+		
+		this.menu.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
+		this.menu.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+	},
 
-        this._parentActor = actor;
-        this._parentMenu = menu;
-        this.closeCallback = closeCallback;
+	openMenu: function() {
+		if (!this.menu.isOpen) {
+			this.menu.open(true);
+		}
+	},
 
-        this._parentActor.reactive = true;
-        this._parentActor.connect('enter-event', Lang.bind(this, this._onEnter));
-        this._parentActor.connect('leave-event', Lang.bind(this, this._onLeave));
+	closeMenu: function() {
+		this.menu.close(true);
+		this.closeCallback();
+	},
+	
+	stayOnMenu: function() {
+		this.closeFlag = false;
+	},
 
-        // If we're reactive, it means that we can move our mouse to the popup
-        // menu and interact with it.  It shouldn't close while we're interacting
-        // with it.
-        if (params.reactive) {
-            this._parentMenu.actor.connect('enter-event', Lang.bind(this, this._onParentMenuEnter));
-            this._parentMenu.actor.connect('leave-event', Lang.bind(this, this._onParentMenuLeave));
-        }
-
-        if (params.clickShouldImpede || params.clickShouldClose) {
-            this.clickShouldImpede = params.clickShouldImpede;
-            this.clickShouldClose = params.clickShouldClose;
-            this._parentActor.connect('button-press-event', Lang.bind(this, this._onButtonPress));
-        }
-    },
-
-    _onButtonPress: function() {
-        if (this.clickShouldImpede) {
-            this.shouldOpen = false;
-        }
-        if (this.clickShouldClose) {
-            if (!this.impedeClose) {
-                this.shouldClose = true;
-            }
-            this.close();
-        }
-    },
-
-    _onParentMenuEnter: function() {
-        this.shouldClose = false;
-    },
-
-    _onParentMenuLeave: function() {
-        this.shouldClose = true;
-
-        this.close();
-    },
-
-    _onEnter: function() {
-        if (!this.impedeOpen) {
-            this.shouldOpen = true;
-        }
-        this.shouldClose = false;
-
-        this.open();
-    },
-
-    _onLeave: function() {
-        if (!this.impedeClose) {
-            this.shouldClose = true;
-        }
-        this.shouldOpen = false;
-
-        this.close();
-    },
-
-    open: function() {
-        if (this.shouldOpen && !this._parentMenu.isOpen) {
-            this._parentMenu.open(true);
-        }
-    },
-
-    close: function() {
-        if (this.shouldClose) {
-            this._parentMenu.close(true);
-            this.closeCallback();
-        }
-    },
-
-    enable: function() {
-        this.impedeOpen = false;
-    },
-
-    disable: function() {
-        this.impedeOpen = true;
-    }
+	requestCloseMenu: function() {
+		this.closeFlag = true;
+						  
+		Mainloop.timeout_add(
+			THUMBNAIL_DISAPPEAR_TIMEOUT,
+			Lang.bind(this, function() {
+						  if (this.closeFlag) {
+							  this.closeMenu();
+						  }
+		
+						  return false;			// don't repeat in Mainloop.timeout
+					  })
+		);					  
+	}
 };
 
 function HoverMenu() {
@@ -838,7 +794,7 @@ function init(extensionMeta) {
     dockFramePaddingY = 1;
     dockIconPaddingY = 1;
     dockFrameHeight = Math.floor(Main.panel.actor.get_height() - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
-    dockFrameWidth = Math.floor(dockFrameHeight * 4 / 3);
+    dockFrameWidth = Math.floor(dockFrameHeight * 3 / 2);
     dockIconSize = dockFrameHeight - 2 * dockIconPaddingY;
 }
 
