@@ -28,10 +28,11 @@ const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 
 const THUMBNAIL_DEFAULT_SIZE = 150;
-const THUMBNAIL_DISAPPEAR_TIMEOUT = 500; // milliseconds
+const THUMBNAIL_DISAPPEAR_TIMEOUT = 100; // milliseconds
 
 //hide
 let dockIconSize;
+let panelHeight;
 let dockFrameWidth;
 let dockFrameHeight;
 let dockFramePaddingX;
@@ -228,8 +229,6 @@ DockIcon.prototype = {
         this._menu = null;
         this._menuManager = new PopupMenu.PopupMenuManager(this);
 
-        this._has_focus = false;
-
         let tracker = Shell.WindowTracker.get_default();
         tracker.connect('notify::focus-app', Lang.bind(this, this._onStateChanged));
 
@@ -269,23 +268,10 @@ DockIcon.prototype = {
     },
 
     _hoverChanged: function(actor) {
-        global.log("hover");
-
-        if (actor != this.actor)
-            this._has_focus = false;
-        else
-            this._has_focus = true;
-
         let windows = this.app.get_windows();
         if (windows.length >= 1 && !this.hasHoverMenu) {
-            global.log(this._has_focus);
-            let thumbnailMenu = new AppThumbnailHoverMenu(this, this.actor, windows[0], this.app);
-            new HoverMenuController(this.actor, thumbnailMenu, this.disableHoverMenu);
-			
-			// this._menuManager.addMenu(thumbnailMenu, true);
-			// thumbnailMenu.open();
-
-            global.log("Got it");
+            let thumbnailMenu = new AppThumbnailHoverMenu(this, this.actor, windows[0], this.app, this.disableHoverMenu);
+            new HoverMenuController(this.actor, thumbnailMenu);
 
             this.enableHoverMenu();
         }
@@ -435,7 +421,15 @@ DockThumbnail.prototype = {
                                     can_focus: true});
 
         this.actorBox = new St.BoxLayout({vertical: true,
+										  reactive: true,
                                           can_focus: true});
+		this.actorBox.connect('enter-event', Lang.bind(this, this.select));
+		this.actorBox.connect('leave-event', Lang.bind(this, this.unselect));
+		this.actor.connect(
+			'clicked', 
+			Lang.bind(this, function() {
+						  Main.activateWindow(this.window);
+					  }));
         this.actor.set_child(this.actorBox);
 
         this.icon = null;
@@ -462,14 +456,14 @@ DockThumbnail.prototype = {
 
     select: function() {
         if (!this.highlighted) {
-            this.actor.add_style_pseudo_class('windowSelected');
+            this.actor.add_style_pseudo_class('hover');
             this.highlighted = true;
         }
     },
 
     unselect: function() {
         if (this.highlighted) {
-            this.actor.remove_style_pseudo_class('windowSelected');
+            this.actor.remove_style_pseudo_class('hover');
             this.highlighted = false;
         }
     },
@@ -534,23 +528,6 @@ DockIconMenu.prototype = {
 
         let windows = this._source.app.get_windows();
 
-        // Display the app windows menu items and the separator between windows
-        // of the current desktop and other windows.
-        let activeWorkspace = global.screen.get_active_workspace();
-        let separatorShown = windows.length > 0 && windows[0].get_workspace() != activeWorkspace;
-
-        for (let i = 0; i < windows.length; i++) {
-            if (!separatorShown && windows[i].get_workspace() != activeWorkspace) {
-                this._appendSeparator();
-                separatorShown = true;
-            }
-            let item = this._appendMenuItem(windows[i].title);
-            item._window = windows[i];
-        }
-
-        if (windows.length > 0)
-            this._appendSeparator();
-
         let isFavorite = AppFavorites.getAppFavorites().isFavorite(this._source.app.get_id());
 
         this._newWindowMenuItem = windows.length > 0 ? this._appendMenuItem(_("New Window")) : null;
@@ -593,49 +570,47 @@ function HoverMenuController() {
 }
 
 HoverMenuController.prototype = {
-    _init: function(dockIcon, menu, closeCallback) {
-		this.dockIcon = dockIcon;
-		this.menu = menu;
-		this.closeCallback = closeCallback;
-		this.closeFlag = false;
-		
-		this.dockIcon.reactive = true;
-		this.dockIcon.connect('enter-event', Lang.bind(this, this.openMenu));
-		this.dockIcon.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
-		
-		this.menu.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
-		this.menu.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
-	},
+    _init: function(dockIcon, menu) {
+        this.dockIcon = dockIcon;
+        this.menu = menu;
+        this.closeFlag = false;
 
-	openMenu: function() {
-		if (!this.menu.isOpen) {
-			this.menu.open(true);
-		}
-	},
+        this.dockIcon.reactive = true;
+        this.dockIcon.connect('enter-event', Lang.bind(this, this.openMenu));
+        this.dockIcon.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
 
-	closeMenu: function() {
-		this.menu.close(true);
-		this.closeCallback();
-	},
-	
-	stayOnMenu: function() {
-		this.closeFlag = false;
-	},
+        this.menu.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
+        this.menu.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+    },
 
-	requestCloseMenu: function() {
-		this.closeFlag = true;
-						  
-		Mainloop.timeout_add(
-			THUMBNAIL_DISAPPEAR_TIMEOUT,
-			Lang.bind(this, function() {
-						  if (this.closeFlag) {
-							  this.closeMenu();
-						  }
-		
-						  return false;			// don't repeat in Mainloop.timeout
-					  })
-		);					  
-	}
+    openMenu: function() {
+        if (!this.menu.isOpen) {
+            this.menu.open(true);
+        }
+    },
+
+    closeMenu: function() {
+        this.menu.close(true);
+    },
+
+    stayOnMenu: function() {
+        this.closeFlag = false;
+    },
+
+    requestCloseMenu: function() {
+        this.closeFlag = true;
+
+        Mainloop.timeout_add(
+            THUMBNAIL_DISAPPEAR_TIMEOUT,
+            Lang.bind(this, function() {
+                          if (this.closeFlag) {
+                              this.closeMenu();
+                          }
+
+                          return false;         // don't repeat in Mainloop.timeout
+                      })
+        );
+    }
 };
 
 function HoverMenu() {
@@ -669,12 +644,13 @@ function AppThumbnailHoverMenu() {
 AppThumbnailHoverMenu.prototype = {
     __proto__: HoverMenu.prototype,
 
-    _init: function(source, actor, metaWindow, app) {
+    _init: function(source, actor, metaWindow, app, closeCallback) {
         HoverMenu.prototype._init.call(this, actor, { reactive: true });
 
         this.source = source;
         this.metaWindow = metaWindow;
         this.app = app;
+        this.closeCallback = closeCallback;
 
         this.appSwitcherItem = new PopupMenuAppSwitcherItem(this, source, this.metaWindow, this.app);
         this.addMenuItem(this.appSwitcherItem);
@@ -683,9 +659,12 @@ AppThumbnailHoverMenu.prototype = {
     open: function(animate) {
         this.appSwitcherItem._refresh();
         PopupMenu.PopupMenu.prototype.open.call(this);
+    },
+
+    close: function() {
+        this.closeCallback();
+        PopupMenu.PopupMenu.prototype.close.call(this);
     }
-
-
 };
 
 // display a list of app thumbnails and allow
@@ -701,29 +680,35 @@ PopupMenuAppSwitcherItem.prototype = {
         params = Params.parse(params, { hover: false });
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
 
-		
+
         let primary = Main.layoutManager.primaryMonitor;
         this.monitorWidth = primary.width;
         this.monitorHeight = primary.height;
-        this.windowWidth = this.monitorWidth * 3 / 4;
+        this.thumbnailWindowWidth = this.monitorWidth * 9 / 10;
+        this.thumbnailWindowHeight = this.monitorHeight * 9 / 10;
+        this.thumbnailWindowPaddingX = 10;
+        this.thumbnailWindowPaddingUp = 10;
+        this.thumbnailWindowPaddingBottom = 20;
         this.thumbnailBorder = 1;
         this.thumbnailPaddingX = 10;
         this.thumbnailPaddingY = 10;
         this.thumbnailFontSize = 15;
-        this.windowPaddingX = 10;
-        this.windowPaddingUp = 10;
-        this.windowPaddingBottom = 20;
-        this.thumbnailColumns = 4;
-        this.thumbnailRows = 4;
-        this.thumbnailWidth = (this.windowWidth - (this.thumbnailColumns * (this.thumbnailPaddingX + this.thumbnailBorder) * 2) - this.windowPaddingX * 2) / this.thumbnailColumns;
+        this.thumbnailWidth = this.thumbnailWindowWidth / 6;
         this.thumbnailHeight = this.thumbnailWidth * (this.monitorHeight / this.monitorWidth);
-		
+
+        // Those attributes need calculate dynamically.
+        this.thumbnailColumns = 0;
+        this.thumbnailRows = 0;
+        this.requestWidth = 0;
+        this.requestHeight = 0;
+        this.sizeAdjustFlag = false;
+
         this.menu = menu;
         this.source = source;
         this.app = app;
 
         this.appContainer = new St.Table();
-		
+
         this.addActor(this.appContainer);
     },
 
@@ -737,52 +722,60 @@ PopupMenuAppSwitcherItem.prototype = {
         this.appContainer.get_children().forEach(Lang.bind(this, function (child) {
                                                                child.destroy();
                                                            }));
-		
+
         let windows = this.app.get_windows();
-		let maxWidth = 0;
-		let thumbnailNum = windows.length;
-		
-		for (let j = 0; j < windows.length; j++) {
-			let [winWidth, winHeight] = windows[j].get_compositor_private().get_texture().get_size();
-			if (winWidth > maxWidth) {
-				maxWidth = winWidth;
-			}
-		}
-		
-		this.requestWidth = this.thumbnailWidth / this.monitorWidth * maxWidth;
-		this.requestHeight = this.thumbnailHeight;
-				
-		
+        let maxWidth = 0;
+        let thumbnailNum = windows.length;
+
+        if (this.sizeAdjustFlag) {
+            for (let j = 0; j < windows.length; j++) {
+                let [winWidth, winHeight] = windows[j].get_compositor_private().get_texture().get_size();
+                if (winWidth > maxWidth) {
+                    maxWidth = winWidth;
+                }
+            }
+
+            this.requestWidth = this.thumbnailWidth / this.monitorWidth * maxWidth;
+            this.requestHeight = this.thumbnailHeight;
+        } else {
+            this.requestWidth = this.thumbnailWidth;
+            this.requestHeight = this.thumbnailHeight;
+        }
+
+
+        this.thumbnailColumns = Math.floor((this.thumbnailWindowWidth - this.thumbnailWindowPaddingX * 2) / (this.requestWidth + (this.thumbnailPaddingX + this.thumbnailBorder) * 2));
+        this.thumbnailRows = Math.floor((this.thumbnailWindowHeight - this.thumbnailWindowPaddingUp - this.thumbnailWindowPaddingBottom) / (this.requestWidth + (this.thumbnailPaddingY + this.thumbnailBorder) * 2));
+
         let childBox = new Clutter.ActorBox();
         let rows = Math.floor(thumbnailNum / this.thumbnailColumns) + (thumbnailNum % this.thumbnailColumns ? 1 : 0);
         let windowWidth = 0;
         if (thumbnailNum > this.thumbnailColumns) {
-            windowWidth = this.thumbnailColumns * this.requestWidth + this.thumbnailColumns * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.windowPaddingX * 2;
+            windowWidth = this.thumbnailColumns * this.requestWidth + this.thumbnailColumns * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.thumbnailWindowPaddingX * 2;
         } else {
-            windowWidth = thumbnailNum * this.requestWidth + thumbnailNum * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.windowPaddingX * 2;
+            windowWidth = thumbnailNum * this.requestWidth + thumbnailNum * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.thumbnailWindowPaddingX * 2;
         }
-        let windowHeight = rows * this.requestHeight + rows * (this.thumbnailPaddingY + this.thumbnailBorder) * 2 + rows * this.thumbnailFontSize + this.windowPaddingUp + this.windowPaddingBottom;
-		let [iconX, iconY] = this.source.actor.get_transformed_position();
-		let windowOffsetX = iconX + windowWidth / 2;
-		let windowOffsetY = iconY;
-		this.menu.box.set_position(windowOffsetX, windowOffsetY);
-		this.menu.box.set_size(windowWidth, windowHeight);
+        let windowHeight = rows * this.requestHeight + rows * (this.thumbnailPaddingY + this.thumbnailBorder) * 2 + rows * this.thumbnailFontSize + this.thumbnailWindowPaddingUp + this.thumbnailWindowPaddingBottom;
+        let [iconX, iconY] = this.source.actor.get_transformed_position();
+        let windowOffsetX = iconX + windowWidth / 2;
+        let windowOffsetY = iconY;
+        this.menu.box.set_position(windowOffsetX, windowOffsetY);
+        this.menu.box.set_size(windowWidth, windowHeight);
 
         for (let i = 0; i < windows.length; i++) {
             let index = i;
             let iconRow = Math.floor(index / this.thumbnailColumns);
             let iconColumn = index % this.thumbnailColumns;
             let windowThumbnail = new DockThumbnail(
-				this.app, 
-				windows[i], 
-				this.requestWidth,
-				this.requestHeight);
+                this.app,
+                windows[i],
+                this.requestWidth,
+                this.requestHeight);
             this.appContainer.add(windowThumbnail.actor,
-								  {row: iconRow,
-								   col: iconColumn
-								  });
+                                  {row: iconRow,
+                                   col: iconColumn
+                                  });
             this._connectToWindowOpen(windowThumbnail.actor, windows[i]);
-		}
+        }
     }
 };
 
@@ -793,7 +786,8 @@ function init(extensionMeta) {
     dockFramePaddingX = 2;
     dockFramePaddingY = 1;
     dockIconPaddingY = 1;
-    dockFrameHeight = Math.floor(Main.panel.actor.get_height() - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
+    panelHeight = Main.panel.actor.get_height();
+    dockFrameHeight = Math.floor(panelHeight - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
     dockFrameWidth = Math.floor(dockFrameHeight * 3 / 2);
     dockIconSize = dockFrameHeight - 2 * dockIconPaddingY;
 }
