@@ -271,7 +271,6 @@ DockIcon.prototype = {
         let windows = this.app.get_windows();
         if (windows.length >= 1 && !this.hasHoverMenu) {
             let thumbnailMenu = new AppThumbnailHoverMenu(this, this.actor, windows[0], this.app, this.disableHoverMenu);
-            new HoverMenuController(this.actor, thumbnailMenu);
 
             this.enableHoverMenu();
         }
@@ -565,54 +564,6 @@ DockIconMenu.prototype = {
     }
 };
 
-function HoverMenuController() {
-    this._init.apply(this, arguments);
-}
-
-HoverMenuController.prototype = {
-    _init: function(dockIcon, menu) {
-        this.dockIcon = dockIcon;
-        this.menu = menu;
-        this.closeFlag = false;
-
-        this.dockIcon.reactive = true;
-        this.dockIcon.connect('enter-event', Lang.bind(this, this.openMenu));
-        this.dockIcon.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
-
-        this.menu.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
-        this.menu.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
-    },
-
-    openMenu: function() {
-        if (!this.menu.isOpen) {
-            this.menu.open(true);
-        }
-    },
-
-    closeMenu: function() {
-        this.menu.close(true);
-    },
-
-    stayOnMenu: function() {
-        this.closeFlag = false;
-    },
-
-    requestCloseMenu: function() {
-        this.closeFlag = true;
-
-        Mainloop.timeout_add(
-            THUMBNAIL_DISAPPEAR_TIMEOUT,
-            Lang.bind(this, function() {
-                          if (this.closeFlag) {
-                              this.closeMenu();
-                          }
-
-                          return false;         // don't repeat in Mainloop.timeout
-                      })
-        );
-    }
-};
-
 function HoverMenu() {
     this._init.apply(this, arguments);
 }
@@ -654,6 +605,15 @@ AppThumbnailHoverMenu.prototype = {
 
         this.appSwitcherItem = new PopupMenuAppSwitcherItem(this, source, this.metaWindow, this.app);
         this.addMenuItem(this.appSwitcherItem);
+		
+        this.closeFlag = false;
+
+        this.source.actor.reactive = true;
+        this.source.actor.connect('enter-event', Lang.bind(this, this.openMenu));
+        this.source.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+
+        this.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+        this.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
     },
 
     open: function(animate) {
@@ -664,6 +624,35 @@ AppThumbnailHoverMenu.prototype = {
     close: function() {
         this.closeCallback();
         PopupMenu.PopupMenu.prototype.close.call(this);
+    },
+
+    openMenu: function() {
+        if (!this.isOpen) {
+            this.open(true);
+        }
+    },
+
+    closeMenu: function() {
+        this.close(true);
+    },
+
+    stayOnMenu: function() {
+        this.closeFlag = false;
+    },
+
+    requestCloseMenu: function() {
+        this.closeFlag = true;
+
+        Mainloop.timeout_add(
+            THUMBNAIL_DISAPPEAR_TIMEOUT,
+            Lang.bind(this, function() {
+                          if (this.closeFlag) {
+                              this.closeMenu();
+                          }
+
+                          return false;         // don't repeat in Mainloop.timeout
+                      })
+        );
     }
 };
 
@@ -712,16 +701,11 @@ PopupMenuAppSwitcherItem.prototype = {
         this.addActor(this.appContainer);
     },
 
-    _connectToWindowOpen: function(actor, metaWindow) {
-        actor.connect('button-release-event', Lang.bind(this, function() {
-                                                            metaWindow.activate(global.get_current_time());
-                                                        }));
-    },
-
     _refresh: function() {
-        this.appContainer.get_children().forEach(Lang.bind(this, function (child) {
-                                                               child.destroy();
-                                                           }));
+        this.appContainer.get_children().forEach(
+			Lang.bind(this, function (child) {
+						  child.destroy();
+                      }));
 
         let windows = this.app.get_windows();
         let maxWidth = 0;
@@ -741,7 +725,6 @@ PopupMenuAppSwitcherItem.prototype = {
             this.requestWidth = this.thumbnailWidth;
             this.requestHeight = this.thumbnailHeight;
         }
-
 
         this.thumbnailColumns = Math.floor((this.thumbnailWindowWidth - this.thumbnailWindowPaddingX * 2) / (this.requestWidth + (this.thumbnailPaddingX + this.thumbnailBorder) * 2));
         this.thumbnailRows = Math.floor((this.thumbnailWindowHeight - this.thumbnailWindowPaddingUp - this.thumbnailWindowPaddingBottom) / (this.requestWidth + (this.thumbnailPaddingY + this.thumbnailBorder) * 2));
@@ -774,7 +757,6 @@ PopupMenuAppSwitcherItem.prototype = {
                                   {row: iconRow,
                                    col: iconColumn
                                   });
-            this._connectToWindowOpen(windowThumbnail.actor, windows[i]);
         }
     }
 };
