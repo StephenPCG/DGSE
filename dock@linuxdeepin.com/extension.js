@@ -43,7 +43,7 @@ let appMenu;
 let dock;
 
 function Dock() {
-    this._init();
+    this._init.apply(this, arguments);
 }
 
 Dock.prototype = {
@@ -204,8 +204,8 @@ Dock.prototype = {
 };
 Signals.addSignalMethods(Dock.prototype);
 
-function DockIcon(app, dock) {
-    this._init(app, dock);
+function DockIcon() {
+    this._init.apply(this, arguments);
 }
 
 DockIcon.prototype = {
@@ -402,14 +402,15 @@ DockIcon.prototype = {
 };
 Signals.addSignalMethods(DockIcon.prototype);
 
-function DockThumbnail(app, window, width, height) {
-    this._init(app, window, width, height);
+function DockThumbnail() {
+    this._init.apply(this, arguments);
 }
 
 DockThumbnail.prototype = {
-    _init : function(app, window, width, height) {
+    _init : function(app, window, width, height, menu) {
         this.app = app;
         this.window = window;
+		this.menu = menu;
 
         this.highlighted = false;
 
@@ -426,6 +427,7 @@ DockThumbnail.prototype = {
 			'clicked', 
 			Lang.bind(this, function() {
 						  Main.activateWindow(this.window);
+						  this.menu.close();
 					  }));
         this.actor.set_child(this.actorBox);
 
@@ -494,8 +496,8 @@ DockThumbnail.prototype = {
 };
 Signals.addSignalMethods(DockThumbnail.prototype);
 
-function DockIconMenu(source) {
-    this._init(source);
+function DockIconMenu() {
+    this._init.apply(this, arguments);
 }
 
 DockIconMenu.prototype = {
@@ -597,10 +599,8 @@ AppThumbnailHoverMenu.prototype = {
         HoverMenu.prototype._init.call(this, dockIcon.actor, { reactive: true });
 
         this.dockIcon = dockIcon;
-        this.app = dockIcon.app;
-        this.metaWindow = this.app.get_windows()[0];
 
-        this.appSwitcherItem = new PopupMenuAppSwitcherItem(this, dockIcon, this.metaWindow, this.app);
+        this.appSwitcherItem = new PopupMenuAppSwitcherItem(this, dockIcon);
         this.addMenuItem(this.appSwitcherItem);
 		
         this.closeFlag = false;
@@ -609,18 +609,22 @@ AppThumbnailHoverMenu.prototype = {
         this.dockIcon.actor.connect('enter-event', Lang.bind(this, this.openMenu));
         this.dockIcon.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
 
-        this.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
         this.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
+        this.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
     },
 
     open: function(animate) {
         this.appSwitcherItem._refresh();
-        PopupMenu.PopupMenu.prototype.open.call(this);
+        PopupMenu.PopupMenu.prototype.open.call(this, animate);
     },
 
-    close: function() {
+    close: function(animate) {
+		global.log("start");
+		
 		this.dockIcon.disableHoverMenu();
-        PopupMenu.PopupMenu.prototype.close.call(this);
+        PopupMenu.PopupMenu.prototype.close.call(this, animate);
+		
+		global.log("end");
     },
 
     openMenu: function() {
@@ -663,7 +667,7 @@ function PopupMenuAppSwitcherItem() {
 PopupMenuAppSwitcherItem.prototype = {
     __proto__: PopupMenu.PopupBaseMenuItem.prototype,
 
-    _init: function (menu, source, metaWindow, app, params) {
+    _init: function (menu, dockIcon, params) {
         params = Params.parse(params, { hover: false });
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
 
@@ -691,8 +695,8 @@ PopupMenuAppSwitcherItem.prototype = {
         this.sizeAdjustFlag = false;
 
         this.menu = menu;
-        this.source = source;
-        this.app = app;
+        this.dockIcon = dockIcon;
+        this.app = dockIcon.app;
 
         this.appContainer = new St.Table();
 
@@ -736,7 +740,7 @@ PopupMenuAppSwitcherItem.prototype = {
             windowWidth = thumbnailNum * this.requestWidth + thumbnailNum * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.thumbnailWindowPaddingX * 2;
         }
         let windowHeight = rows * this.requestHeight + rows * (this.thumbnailPaddingY + this.thumbnailBorder) * 2 + rows * this.thumbnailFontSize + this.thumbnailWindowPaddingUp + this.thumbnailWindowPaddingBottom;
-        let [iconX, iconY] = this.source.actor.get_transformed_position();
+        let [iconX, iconY] = this.dockIcon.actor.get_transformed_position();
         let windowOffsetX = iconX + windowWidth / 2;
         let windowOffsetY = iconY;
         this.menu.box.set_position(windowOffsetX, windowOffsetY);
@@ -750,7 +754,8 @@ PopupMenuAppSwitcherItem.prototype = {
                 this.app,
                 windows[i],
                 this.requestWidth,
-                this.requestHeight);
+                this.requestHeight,
+				this.menu);
             this.appContainer.add(windowThumbnail.actor,
                                   {row: iconRow,
                                    col: iconColumn
