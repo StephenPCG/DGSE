@@ -45,6 +45,11 @@ let dockThumbnailMenu = null;
 let dockTitleSize = 15;
 let closeButtonSize = 24;
 
+let panelConnectId;
+let panel;
+
+let dateMenu, label, box;
+
 function Dock() {
     this._init.apply(this, arguments);
 }
@@ -809,8 +814,137 @@ PopupMenuAppSwitcherItem.prototype = {
     }
 };
 
+function allocate(actor, box, flags) {
+    let allocWidth = box.x2 - box.x1;
+    let allocHeight = box.y2 - box.y1;
+
+    let [leftMinWidth, leftNaturalWidth] = panel._leftBox.get_preferred_width(-1);
+    let [centerMinWidth, centerNaturalWidth] = panel._centerBox.get_preferred_width(-1);
+    let [rightMinWidth, rightNaturalWidth] = panel._rightBox.get_preferred_width(-1);
+
+    let sideWidth = allocWidth - rightNaturalWidth - centerNaturalWidth;
+
+    let childBox = new Clutter.ActorBox();
+
+    childBox.y1 = 0;
+    childBox.y2 = allocHeight;
+    if (panel.actor.get_direction() == St.TextDirection.RTL) {
+        childBox.x1 = allocWidth - Math.min(Math.floor(sideWidth), leftNaturalWidth);
+        childBox.x2 = allocWidth;
+    } else {
+        childBox.x1 = 0;
+        childBox.x2 = Math.min(Math.floor(sideWidth), leftNaturalWidth);
+    }
+    panel._leftBox.allocate(childBox, flags);
+
+    childBox.y1 = 0;
+    childBox.y2 = allocHeight;
+    if (panel.actor.get_direction() == St.TextDirection.RTL) {
+        childBox.x1 = rightNaturalWidth;
+        childBox.x2 = childBox.x1 + centerNaturalWidth;
+    } else {
+        childBox.x1 = allocWidth - centerNaturalWidth - rightNaturalWidth;
+        childBox.x2 = childBox.x1 + centerNaturalWidth;
+    }
+    panel._centerBox.allocate(childBox, flags);
+
+    childBox.y1 = 0;
+    childBox.y2 = allocHeight;
+    if (panel.actor.get_direction() == St.TextDirection.RTL) {
+        childBox.x1 = 0;
+        childBox.x2 = rightNaturalWidth;
+    } else {
+        childBox.x1 = allocWidth - rightNaturalWidth;
+        childBox.x2 = allocWidth;
+    }
+    panel._rightBox.allocate(childBox, flags);
+
+    let [cornerMinWidth, cornerWidth] = panel._leftCorner.actor.get_preferred_width(-1);
+    let [cornerMinHeight, cornerHeight] = panel._leftCorner.actor.get_preferred_width(-1);
+    childBox.x1 = 0;
+    childBox.x2 = cornerWidth;
+    childBox.y1 = allocHeight;
+    childBox.y2 = allocHeight + cornerHeight;
+    panel._leftCorner.actor.allocate(childBox, flags);
+
+    let [cornerMinWidth, cornerWidth] = panel._rightCorner.actor.get_preferred_width(-1);
+    let [cornerMinHeight, cornerHeight] = panel._rightCorner.actor.get_preferred_width(-1);
+    childBox.x1 = allocWidth - cornerWidth;
+    childBox.x2 = allocWidth;
+    childBox.y1 = allocHeight;
+    childBox.y2 = allocHeight + cornerHeight;
+    panel._rightCorner.actor.allocate(childBox, flags);
+}
+
+function MyBox(label) {
+    this._init(label);
+}
+
+MyBox.prototype = {
+    _init: function(label) {
+        this.actor = new Shell.GenericContainer();
+        this._label = label;
+        this.actor.add_actor(label);
+        this._width = 0;
+
+        this.actor.connect('get-preferred-width', Lang.bind(this, this._getPreferredWidth));
+        this.actor.connect('get-preferred-height', Lang.bind(this, this._getPreferredHeight));
+        this.actor.connect('allocate', Lang.bind(this, this._allocate));
+    },
+
+    _getPreferredWidth: function(actor, forHeight, alloc) {
+        let [minWidth, natWidth] = this._label.get_preferred_width(forHeight);
+
+        alloc.min_size = minWidth;
+
+        let delta = Math.abs(this._width - natWidth);
+        if ( this._width == 0 || delta*100/this._width > 10 ) {
+            alloc.natural_size = this._width = natWidth+4;
+        }
+        else if ( natWidth > this._width ) {
+            alloc.natural_size = this._width = natWidth;
+        }
+        else {
+            alloc.natural_size = this._width;
+        }
+    },
+
+    _getPreferredHeight: function(actor, forWidth, alloc) {
+        let [minHeight, natHeight] = this._label.get_preferred_height(forWidth);
+        alloc.min_size = minHeight;
+        alloc.natural_size = natHeight;
+    },
+
+    _allocate: function(actor, box, flags) {
+        let availWidth = box.x2 - box.x1;
+        let availHeight = box.y2 - box.y1;
+
+        let [minChildWidth, minChildHeight, natChildWidth, natChildHeight] =
+            this._label.get_preferred_size();
+
+        let childWidth = Math.min(natChildWidth, availWidth);
+        let childHeight = Math.min(natChildHeight, availHeight);
+
+        let childBox = new Clutter.ActorBox();
+        childBox.x1 = 0;
+        childBox.y1 = 0;
+        childBox.x2 = childBox.x1 + childWidth;
+        childBox.y2 = childBox.y1 + childHeight;
+        this._label.allocate(childBox, flags);
+    }
+};
+
 function init(extensionMeta) {
     imports.gettext.bindtextdomain('gnome-shell-extensions', extensionMeta.localedir);
+	
+	// Init move clock.
+    dateMenu = Main.panel._dateMenu;
+    label = dateMenu._clock;
+	
+	// Init extend left box.
+    panel = Main.panel;
+	
+	// Init dock.
     appMenu = Main.panel._appMenu;
     activitiesButtonWidth = Main.panel._activitiesButton.actor.get_width();
     dockFramePaddingX = 2;
@@ -824,6 +958,19 @@ function init(extensionMeta) {
 
 
 function enable() {
+	// Move clock.
+    Main.panel._centerBox.remove_actor(dateMenu.actor);
+
+    dateMenu.actor.remove_actor(label);
+    box = new MyBox(label);
+    dateMenu.actor.add_actor(box.actor);
+
+    let children = Main.panel._rightBox.get_children();
+    Main.panel._rightBox.insert_actor(dateMenu.actor, children.length-1);
+	
+	// Extend left box.
+    panelConnectId = panel.actor.connect('allocate', allocate);
+	
     // Remove application menu.
     Main.panel._leftBox.remove_actor(appMenu.actor);
 
@@ -833,6 +980,17 @@ function enable() {
 }
 
 function disable() {
+	// Restore clock position.
+    Main.panel._rightBox.remove_actor(dateMenu.actor);
+    box.actor.remove_actor(label);
+    box.actor.destroy();
+    box = null;
+    dateMenu.actor.add_actor(label);
+    Main.panel._centerBox.add_actor(dateMenu.actor);
+	
+	// Restore left box.
+    panel.actor.disconnect(panelConnectId);
+	
     // Remove dock.
     dock.destroy();
     dock = null;
