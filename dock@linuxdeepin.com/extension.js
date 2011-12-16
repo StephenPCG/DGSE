@@ -27,7 +27,6 @@ const AltTab = imports.ui.altTab;
 const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 
-const THUMBNAIL_DEFAULT_SIZE = 150;
 const THUMBNAIL_DISAPPEAR_TIMEOUT = 100; // milliseconds
 
 //hide
@@ -276,12 +275,12 @@ DockIcon.prototype = {
     },
 
     _hoverChanged: function(actor) {
-		this.popupThumbnailMenu();		
+        this.popupThumbnailMenu();
 
         return false;
     },
-	
-	popupThumbnailMenu: function() {
+
+    popupThumbnailMenu: function() {
         if (this.app.get_windows().length >= 1 && !this.hasHoverMenu) {
             if (dockThumbnailMenu) {
                 dockThumbnailMenu.close();
@@ -289,7 +288,7 @@ DockIcon.prototype = {
 
             dockThumbnailMenu = new AppThumbnailHoverMenu(this);
         }
-	},
+    },
 
     _onStateChanged: function() {
         let tracker = Shell.WindowTracker.get_default();
@@ -337,7 +336,7 @@ DockIcon.prototype = {
     getId: function() {
         return this.app.get_id();
     },
-	
+
     popupMenu: function() {
         this._removeMenuTimeout();
         this.actor.fake_release();
@@ -422,11 +421,11 @@ function DockThumbnail() {
 }
 
 DockThumbnail.prototype = {
-    _init : function(app, window, width, height, menu, closeWindowCallback) {
+    _init : function(app, window, width, height, menuItem, menu) {
         this.app = app;
         this.window = window;
         this.menu = menu;
-        this.closeWindowCallback = closeWindowCallback;
+        this.menuItem = menuItem;
 
         this.highlighted = false;
 
@@ -459,22 +458,23 @@ DockThumbnail.prototype = {
         this.label = new St.Label(
             {style_class: 'dock-thumbnail-icon-font',
              text: title });
-        let bin = new St.Bin({x_align: St.Align.START});
+        let bin = new St.Bin({x_align: St.Align.MIDDLE});
         bin.add_actor(this.label);
         this.hbox.add(bin, {expand: true});
-		this.hbox.set_width(width);
+        this.hbox.set_width(width);
 
         // Add window close button.
         this.closeButton = new St.Button({ style_class: 'window-close' });
         this.closeBin = new St.Bin({x_fill: true, x_align: St.Align.END, y_align: St.Align.START});
         this.closeBin.child = this.closeButton;
-		this.closeBin.set_size(closeButtonSize, closeButtonSize);
+        this.closeBin.set_size(closeButtonSize, closeButtonSize);
         this.hbox.add(this.closeBin);
         this.closeButton.hide(); // hide close button default
         this.closeButton.connect(
             'clicked',
             Lang.bind(this, function() {
-                          this.closeWindowCallback(this.window);
+                          this.menuItem.closeWindow(this.window);
+                          this.menuItem.refresh(this.window);
                       }));
 
         // Add window thumbnail.
@@ -649,7 +649,7 @@ AppThumbnailHoverMenu.prototype = {
     },
 
     open: function(animate) {
-        this.appSwitcherItem._refresh();
+        this.appSwitcherItem.refresh(null);
         PopupMenu.PopupMenu.prototype.open.call(this, animate);
     },
 
@@ -728,7 +728,6 @@ PopupMenuAppSwitcherItem.prototype = {
         this.menu = menu;
         this.dockIcon = dockIcon;
         this.app = dockIcon.app;
-		this.thumbnails = {};
 
         this.appContainer = new St.Table();
 
@@ -737,79 +736,73 @@ PopupMenuAppSwitcherItem.prototype = {
 
     closeWindow: function(window) {
         window.delete(global.get_current_time());
-		this._refresh();
-		this.menu.removeAll();
-		this.menu.addMenuItem(this);
-		
-		// if (this.thumbnails[window]) {
-		// 	this.appContainer.remove(this.thumbnails[window].actor);
-		// }
-        // this._refresh();
-        // this.menu.queue_relayout();
-
-        global.log(window.get_title());
     },
 
-    _refresh: function() {
+    refresh: function(deleteWindow) {
         this.appContainer.get_children().forEach(
             Lang.bind(this, function (child) {
                           child.destroy();
                       }));
-		this.thumbnails = {};
 
-        let windows = this.app.get_windows();
-        let maxWidth = 0;
-        let thumbnailNum = windows.length;
+        let windows = this.app.get_windows().filter(function (win) {return win != deleteWindow;});
+        if (windows.length == 0) {
+            if (dockThumbnailMenu) {
+                dockThumbnailMenu.close();
+            }
+            dockThumbnailMenu = null;
+        } else {
+            let maxWidth = 0;
+            let thumbnailNum = windows.length;
 
-        if (this.sizeAdjustFlag) {
-            for (let j = 0; j < windows.length; j++) {
-                let [winWidth, winHeight] = windows[j].get_compositor_private().get_texture().get_size();
-                if (winWidth > maxWidth) {
-                    maxWidth = winWidth;
+            if (this.sizeAdjustFlag) {
+                for (let j = 0; j < windows.length; j++) {
+                    let [winWidth, winHeight] = windows[j].get_compositor_private().get_texture().get_size();
+                    if (winWidth > maxWidth) {
+                        maxWidth = winWidth;
+                    }
                 }
+
+                this.requestWidth = this.thumbnailWidth / this.monitorWidth * maxWidth;
+                this.requestHeight = this.thumbnailHeight;
+            } else {
+                this.requestWidth = this.thumbnailWidth;
+                this.requestHeight = this.thumbnailHeight;
             }
 
-            this.requestWidth = this.thumbnailWidth / this.monitorWidth * maxWidth;
-            this.requestHeight = this.thumbnailHeight;
-        } else {
-            this.requestWidth = this.thumbnailWidth;
-            this.requestHeight = this.thumbnailHeight;
-        }
+            this.thumbnailColumns = Math.floor((this.thumbnailWindowWidth - this.thumbnailWindowPaddingX * 2) / (this.requestWidth + (this.thumbnailPaddingX + this.thumbnailBorder) * 2));
+            this.thumbnailRows = Math.floor((this.thumbnailWindowHeight - this.thumbnailWindowPaddingUp - this.thumbnailWindowPaddingBottom) / (this.requestWidth + (this.thumbnailPaddingY + this.thumbnailBorder) * 2));
 
-        this.thumbnailColumns = Math.floor((this.thumbnailWindowWidth - this.thumbnailWindowPaddingX * 2) / (this.requestWidth + (this.thumbnailPaddingX + this.thumbnailBorder) * 2));
-        this.thumbnailRows = Math.floor((this.thumbnailWindowHeight - this.thumbnailWindowPaddingUp - this.thumbnailWindowPaddingBottom) / (this.requestWidth + (this.thumbnailPaddingY + this.thumbnailBorder) * 2));
+            let childBox = new Clutter.ActorBox();
+            let rows = Math.floor(thumbnailNum / this.thumbnailColumns) + (thumbnailNum % this.thumbnailColumns ? 1 : 0);
+            let windowWidth = 0;
+            if (thumbnailNum > this.thumbnailColumns) {
+                windowWidth = this.thumbnailColumns * this.requestWidth + this.thumbnailColumns * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.thumbnailWindowPaddingX * 2;
+            } else {
+                windowWidth = thumbnailNum * this.requestWidth + thumbnailNum * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.thumbnailWindowPaddingX * 2;
+            }
+            let windowHeight = rows * this.requestHeight + rows * (this.thumbnailPaddingY + this.thumbnailBorder) * 2 + rows * this.thumbnailFontSize + this.thumbnailWindowPaddingUp + this.thumbnailWindowPaddingBottom;
+            let [iconX, iconY] = this.dockIcon.actor.get_transformed_position();
+            let windowOffsetX = iconX + windowWidth / 2;
+            let windowOffsetY = iconY;
+            this.menu.box.set_position(windowOffsetX, windowOffsetY);
+            this.menu.box.set_size(windowWidth, windowHeight);
 
-        let childBox = new Clutter.ActorBox();
-        let rows = Math.floor(thumbnailNum / this.thumbnailColumns) + (thumbnailNum % this.thumbnailColumns ? 1 : 0);
-        let windowWidth = 0;
-        if (thumbnailNum > this.thumbnailColumns) {
-            windowWidth = this.thumbnailColumns * this.requestWidth + this.thumbnailColumns * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.thumbnailWindowPaddingX * 2;
-        } else {
-            windowWidth = thumbnailNum * this.requestWidth + thumbnailNum * (this.thumbnailPaddingX + this.thumbnailBorder) * 2 + this.thumbnailWindowPaddingX * 2;
-        }
-        let windowHeight = rows * this.requestHeight + rows * (this.thumbnailPaddingY + this.thumbnailBorder) * 2 + rows * this.thumbnailFontSize + this.thumbnailWindowPaddingUp + this.thumbnailWindowPaddingBottom;
-        let [iconX, iconY] = this.dockIcon.actor.get_transformed_position();
-        let windowOffsetX = iconX + windowWidth / 2;
-        let windowOffsetY = iconY;
-        this.menu.box.set_position(windowOffsetX, windowOffsetY);
-        this.menu.box.set_size(windowWidth, windowHeight);
-
-        for (let i = 0; i < windows.length; i++) {
-            let index = i;
-            let iconRow = Math.floor(index / this.thumbnailColumns);
-            let iconColumn = index % this.thumbnailColumns;
-            let windowThumbnail = new DockThumbnail(
-                this.app,
-                windows[i],
-                this.requestWidth,
-                this.requestHeight,
-                this.menu,
-                this.closeWindow);
-            this.appContainer.add(windowThumbnail.actor,
-                                  {row: iconRow,
-                                   col: iconColumn
-                                  });
-			this.thumbnails[windows[i]] = windowThumbnail;
+            for (let i = 0; i < windows.length; i++) {
+                let index = i;
+                let iconRow = Math.floor(index / this.thumbnailColumns);
+                let iconColumn = index % this.thumbnailColumns;
+                let windowThumbnail = new DockThumbnail(
+                    this.app,
+                    windows[i],
+                    this.requestWidth,
+                    this.requestHeight,
+                    this,
+                    this.menu);
+                this.appContainer.add(windowThumbnail.actor,
+                                      {row: iconRow,
+                                       col: iconColumn
+                                      });
+            }
         }
     }
 };
@@ -936,15 +929,15 @@ MyBox.prototype = {
 
 function init(extensionMeta) {
     imports.gettext.bindtextdomain('gnome-shell-extensions', extensionMeta.localedir);
-	
-	// Init move clock.
+
+    // Init move clock.
     dateMenu = Main.panel._dateMenu;
     label = dateMenu._clock;
-	
-	// Init extend left box.
+
+    // Init extend left box.
     panel = Main.panel;
-	
-	// Init dock.
+
+    // Init dock.
     appMenu = Main.panel._appMenu;
     activitiesButtonWidth = Main.panel._activitiesButton.actor.get_width();
     dockFramePaddingX = 2;
@@ -958,7 +951,7 @@ function init(extensionMeta) {
 
 
 function enable() {
-	// Move clock.
+    // Move clock.
     Main.panel._centerBox.remove_actor(dateMenu.actor);
 
     dateMenu.actor.remove_actor(label);
@@ -967,10 +960,10 @@ function enable() {
 
     let children = Main.panel._rightBox.get_children();
     Main.panel._rightBox.insert_actor(dateMenu.actor, children.length-1);
-	
-	// Extend left box.
+
+    // Extend left box.
     panelConnectId = panel.actor.connect('allocate', allocate);
-	
+
     // Remove application menu.
     Main.panel._leftBox.remove_actor(appMenu.actor);
 
@@ -980,17 +973,17 @@ function enable() {
 }
 
 function disable() {
-	// Restore clock position.
+    // Restore clock position.
     Main.panel._rightBox.remove_actor(dateMenu.actor);
     box.actor.remove_actor(label);
     box.actor.destroy();
     box = null;
     dateMenu.actor.add_actor(label);
     Main.panel._centerBox.add_actor(dateMenu.actor);
-	
-	// Restore left box.
+
+    // Restore left box.
     panel.actor.disconnect(panelConnectId);
-	
+
     // Remove dock.
     dock.destroy();
     dock = null;
