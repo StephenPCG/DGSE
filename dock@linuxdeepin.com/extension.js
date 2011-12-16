@@ -31,7 +31,8 @@ const THUMBNAIL_DISAPPEAR_TIMEOUT = 100; // milliseconds
 
 //hide
 let dockIconSize;
-let panelHeight;
+let panelMinHeight;
+let panelNaturalHeight;
 let dockFrameWidth;
 let dockFrameHeight;
 let dockFramePaddingX;
@@ -943,8 +944,8 @@ function init(extensionMeta) {
     dockFramePaddingX = 2;
     dockFramePaddingY = 1;
     dockIconPaddingY = 1;
-    panelHeight = Main.panel.actor.get_height();
-    dockFrameHeight = Math.floor(panelHeight - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
+    [panelMinHeight, panelNaturalHeight] = Main.panel.actor.get_preferred_height(-1);
+    dockFrameHeight = Math.floor(panelNaturalHeight - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
     dockFrameWidth = Math.floor(dockFrameHeight * 3 / 2);
     dockIconSize = dockFrameHeight - 2 * dockIconPaddingY;
 }
