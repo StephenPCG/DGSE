@@ -27,6 +27,7 @@ const AltTab = imports.ui.altTab;
 const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 
+const THUMBNAIL_DEFAULT_WIDTH = 250;
 const THUMBNAIL_DISAPPEAR_TIMEOUT = 100; // milliseconds
 
 //hide
@@ -716,7 +717,8 @@ PopupMenuAppSwitcherItem.prototype = {
         this.thumbnailPaddingX = 10;
         this.thumbnailPaddingY = 10;
         this.thumbnailFontSize = Math.max(closeButtonSize, dockTitleSize);
-        this.thumbnailWidth = this.thumbnailWindowWidth / 5;
+        // this.thumbnailWidth = this.thumbnailWindowWidth / 5;
+        this.thumbnailWidth = THUMBNAIL_DEFAULT_WIDTH;
         this.thumbnailHeight = this.thumbnailWidth * (this.monitorHeight / this.monitorWidth);
 
         // Those attributes need calculate dynamically.
