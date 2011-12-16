@@ -10,10 +10,8 @@ Architecture: all
 Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~),
     deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -40,10 +38,8 @@ Architecture: all
 Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -63,10 +59,8 @@ Architecture: all
 Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -84,42 +78,13 @@ Description: GNOME shell extension -- Removable drive menu
  This is a GNOME shell extension, it provides a status menu for accessing
  and unmounting removable devices.
 
-Package: deepin-gse-extend-left-box
-Architecture: all
-Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
-Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-classic-systray,
-    deepin-gse-drive-menu,
-    deepin-gse-hide-dash,
-    deepin-gse-hide-username,
-    deepin-gse-move-clock,
-    deepin-gse-no-a11y,
-    deepin-gse-no-click-tab,
-    deepin-gse-shutdown-menu,
-    deepin-gse-system-monitor,
-    deepin-gse-window-list,
-    deepin-gse-windowoverlay-icons,
-    deepin-gse-windows-alt-tab,
-    deepin-gse-windows-navigator,
-    deepin-gse-workspace-navigator,
-    deepin-gse-xrandr,
-    deepin-gse-dock,
-    deepin-gse-user-theme,
-    deepin-gse-show-desktop
-Description: GNOME shell extension -- Extend left box
- This is a GNOME shell extension, it extends the _leftBox of topbar,
- combined with window-list extension, you can use the maximum width
- of the topbar.
-
 Package: deepin-gse-hide-dash
 Architecture: all
 Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -143,9 +108,7 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -162,41 +125,14 @@ Suggests: deepin-gse-classic-systray,
 Description: GNOME shell extension -- Hide username
  This is a GNOME shell extension, it hides the username in status area.
 
-Package: deepin-gse-move-clock
-Architecture: all
-Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
-Recommends: gnome-tweak-tool (>=3.2.0-1~)
-Suggests: deepin-gse-classic-systray,
-    deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
-    deepin-gse-hide-dash,
-    deepin-gse-hide-username,
-    deepin-gse-no-a11y,
-    deepin-gse-no-click-tab,
-    deepin-gse-shutdown-menu,
-    deepin-gse-system-monitor,
-    deepin-gse-window-list,
-    deepin-gse-windowoverlay-icons,
-    deepin-gse-windows-alt-tab,
-    deepin-gse-windows-navigator,
-    deepin-gse-workspace-navigator,
-    deepin-gse-xrandr,
-    deepin-gse-dock,
-    deepin-gse-user-theme,
-    deepin-gse-show-desktop
-Description: GNOME shell extension -- Move Clock
- This is a GNOME shell extension, it moves the clock to the right side.
-
 Package: deepin-gse-no-a11y
 Architecture: all
 Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
     deepin-gse-system-monitor,
@@ -218,10 +154,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-shutdown-menu,
     deepin-gse-system-monitor,
@@ -244,10 +178,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-system-monitor,
@@ -269,10 +201,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~), libglib2.0-bin, gir1.2-gtop-
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -294,10 +224,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -319,10 +247,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -344,10 +270,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -369,10 +293,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -394,10 +316,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -419,10 +339,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~), gir1.2-gnomedesktop-3.0
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -444,10 +362,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~)
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -469,10 +385,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~), libglib2.0-bin
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
@@ -494,10 +408,8 @@ Depends: ${misc:Depends}, gnome-shell (>=3.2.0-1~), libglib2.0-bin
 Recommends: gnome-tweak-tool (>=3.2.0-1~)
 Suggests: deepin-gse-classic-systray,
     deepin-gse-drive-menu,
-    deepin-gse-extend-left-box,
     deepin-gse-hide-dash,
     deepin-gse-hide-username,
-    deepin-gse-move-clock,
     deepin-gse-no-a11y,
     deepin-gse-no-click-tab,
     deepin-gse-shutdown-menu,
