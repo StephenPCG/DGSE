@@ -1,8 +1,10 @@
 deepin-gse (1.0.8-1) oneiric; urgency=low
 
-  * Merge move-clock and extend-left-box into dock
+  * merge move-clock and extend-left-box into dock
   * update dock extension
   * update drive-menu extension
+  * remove window-list extension
+  * remove panel favourite extension
 
  -- Zhang Cheng <zhangcheng@linuxdeepin.com>  Fri, 16 Dec 2011 14:04:23 +0800
 
