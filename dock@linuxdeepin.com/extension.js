@@ -27,18 +27,21 @@ const AltTab = imports.ui.altTab;
 const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 
+const THUMBNAIL_DEFAULT_WIDTH = 250;
 const THUMBNAIL_DISAPPEAR_TIMEOUT = 100; // milliseconds
 
 //hide
 let dockIconSize;
 let panelMinHeight;
 let panelNaturalHeight;
+let panelMinWidth;
+let leftBoxWidth;
+let leftPadding;
 let dockFrameWidth;
 let dockFrameHeight;
 let dockFramePaddingX;
 let dockFramePaddingY;
 let dockIconPaddingY;
-let activitiesButtonWidth;
 let appMenu;
 let dock;
 let dockThumbnailMenu = null;
@@ -85,7 +88,7 @@ Dock.prototype = {
 
     _showDock: function() {
         let monitor = Main.layoutManager.primaryMonitor;
-        let x = monitor.x + activitiesButtonWidth;
+        let x = monitor.x + leftBoxWidth + leftPadding;
         let y = 0;
         let width = this._nicons * (dockFrameWidth + dockFramePaddingX) + dockFramePaddingX;
         let height = dockFrameHeight + dockFramePaddingY * 2;
@@ -538,7 +541,7 @@ function DockIconMenu() {
 
 DockIconMenu.prototype = {
     __proto__: AppDisplay.AppIconMenu.prototype,
-
+	
     _init: function(source) {
         PopupMenu.PopupMenu.prototype._init.call(this, source.actor, 0.5, St.Side.TOP, 0);
 
@@ -716,7 +719,8 @@ PopupMenuAppSwitcherItem.prototype = {
         this.thumbnailPaddingX = 10;
         this.thumbnailPaddingY = 10;
         this.thumbnailFontSize = Math.max(closeButtonSize, dockTitleSize);
-        this.thumbnailWidth = this.thumbnailWindowWidth / 5;
+        // this.thumbnailWidth = this.thumbnailWindowWidth / 5;
+        this.thumbnailWidth = THUMBNAIL_DEFAULT_WIDTH;
         this.thumbnailHeight = this.thumbnailWidth * (this.monitorHeight / this.monitorWidth);
 
         // Those attributes need calculate dynamically.
@@ -940,13 +944,14 @@ function init(extensionMeta) {
 
     // Init dock.
     appMenu = Main.panel._appMenu;
-    activitiesButtonWidth = Main.panel._activitiesButton.actor.get_width();
     dockFramePaddingX = 2;
     dockFramePaddingY = 1;
     dockIconPaddingY = 1;
     [panelMinHeight, panelNaturalHeight] = Main.panel.actor.get_preferred_height(-1);
+    leftBoxWidth = Main.panel._leftBox.get_width();
     dockFrameHeight = Math.floor(panelNaturalHeight - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
     dockFrameWidth = Math.floor(dockFrameHeight * 3 / 2);
+    leftPadding = dockFrameWidth * 2 / 3;
     dockIconSize = dockFrameHeight - 2 * dockIconPaddingY;
 }
 
