@@ -541,7 +541,7 @@ function DockIconMenu() {
 
 DockIconMenu.prototype = {
     __proto__: AppDisplay.AppIconMenu.prototype,
-
+	
     _init: function(source) {
         PopupMenu.PopupMenu.prototype._init.call(this, source.actor, 0.5, St.Side.TOP, 0);
 
