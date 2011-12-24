@@ -29,6 +29,7 @@ const _ = Gettext.gettext;
 
 const THUMBNAIL_DEFAULT_WIDTH = 250;
 const THUMBNAIL_DISAPPEAR_TIMEOUT = 100; // milliseconds
+const TOOLTIP_DISAPPEAR_TIMEOUT = 100; // milliseconds
 
 //hide
 let dockIconSize;
@@ -45,6 +46,7 @@ let dockIconPaddingY;
 let appMenu;
 let dock;
 let dockThumbnailMenu = null;
+let appNameTooltip = null;
 let dockTitleSize = 15;
 let closeButtonSize = 24;
 
@@ -254,6 +256,7 @@ DockIcon.prototype = {
         this._dock=dock;
 
         this.hasHoverMenu = false;
+        this.hasTooltipMenu = false;
     },
 
     enableHoverMenu: function() {
@@ -262,6 +265,14 @@ DockIcon.prototype = {
 
     disableHoverMenu: function() {
         this.hasHoverMenu = false;
+    },
+
+    enableTooltipMenu: function() {
+        this.hasTooltipMenu = true;
+    },
+
+    disableTooltipMenu: function() {
+        this.hasTooltipMenu = false;
     },
 
     _onDestroy: function() {
@@ -285,12 +296,25 @@ DockIcon.prototype = {
     },
 
     popupThumbnailMenu: function() {
-        if (this.app.get_windows().length >= 1 && !this.hasHoverMenu) {
-            if (dockThumbnailMenu) {
-                dockThumbnailMenu.close();
-            }
+        // If application's windows more than one.
+        if (this.app.get_windows().length >= 1) {
+            // If hover menu haven't popup.
+            if (!this.hasHoverMenu) {
+                if (dockThumbnailMenu) {
+                    dockThumbnailMenu.close();
+                }
 
-            dockThumbnailMenu = new AppThumbnailHoverMenu(this);
+                dockThumbnailMenu = new AppThumbnailHoverMenu(this);
+            }
+            // Show application name if application haven't windows.
+        } else {
+			if (!this.hasTooltipMenu) {
+				if (appNameTooltip) {
+					appNameTooltip.close();
+				}
+				
+				appNameTooltip = new AppNameTooltip(this);
+			}
         }
     },
 
@@ -541,7 +565,7 @@ function DockIconMenu() {
 
 DockIconMenu.prototype = {
     __proto__: AppDisplay.AppIconMenu.prototype,
-	
+
     _init: function(source) {
         PopupMenu.PopupMenu.prototype._init.call(this, source.actor, 0.5, St.Side.TOP, 0);
 
@@ -627,6 +651,85 @@ HoverMenu.prototype = {
     }
 };
 
+function AppNameTooltip () {
+    this._init.apply(this, arguments);
+}
+
+AppNameTooltip.prototype = {
+    __proto__: HoverMenu.prototype,
+	
+    _init: function(dockIcon) {
+		
+        HoverMenu.prototype._init.call(this, dockIcon.actor, { reactive: true });
+
+        this.dockIcon = dockIcon;
+
+		this.appNameTooltipItem = new AppNameTooltipItem(dockIcon);
+		this.addMenuItem(this.appNameTooltipItem);
+		
+        this.closeFlag = false;
+		
+        this.dockIcon.actor.reactive = true;
+        this.dockIcon.actor.connect('enter-event', Lang.bind(this, this.openMenu));
+        this.dockIcon.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+
+		this.openMenu();
+	},
+	
+    open: function(animate) {
+        PopupMenu.PopupMenu.prototype.open.call(this, animate);
+    },
+
+    close: function(animate) {
+        this.dockIcon.disableTooltipMenu();
+        PopupMenu.PopupMenu.prototype.close.call(this, animate);
+    },
+
+    openMenu: function() {
+        if (!this.isOpen) {
+            this.dockIcon.enableTooltipMenu();
+            this.open(true);
+        }
+    },
+
+    closeMenu: function() {
+        this.close(true);
+    },
+
+    requestCloseMenu: function() {
+        this.closeFlag = true;
+
+        Mainloop.timeout_add(
+            TOOLTIP_DISAPPEAR_TIMEOUT,
+            Lang.bind(this, function() {
+                          if (this.closeFlag) {
+                              this.closeMenu();
+                          }
+
+                          return false;         // don't repeat in Mainloop.timeout
+                      })
+        );
+    }
+};
+
+function AppNameTooltipItem() {
+    this._init.apply(this, arguments);
+}
+
+AppNameTooltipItem.prototype = {
+    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+    _init: function (dockIcon, params) {
+        params = Params.parse(params, { hover: false });
+        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
+		
+        this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: dockIcon.app.get_name() });
+		this.addActor(this.text);
+		
+		this.actor.add_style_class_name('dock-appname-tooltip-item');
+	}
+};
+
 function AppThumbnailHoverMenu() {
     this._init.apply(this, arguments);
 }
@@ -650,6 +753,8 @@ AppThumbnailHoverMenu.prototype = {
 
         this.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
         this.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+		
+		this.openMenu();
     },
 
     open: function(animate) {
