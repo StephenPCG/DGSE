@@ -93,3 +93,18 @@
     padding: 10px 0px 0px 6px;
     text-shadow: rgba(255,255,255,0.35) 0px 1px 0px;
 }
+
+.dock-appname-tooltip {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000000;
+}
+
+.dock-appname-tooltip-item {
+    color: rgba(0,0,0,0.8);
+    font-size: 8.5pt;
+    font-weight: bold;
+    padding: 0px 0px 0px 6px;
+    text-shadow: rgba(255,255,255,0.35) 0px 1px 0px;
+}
+

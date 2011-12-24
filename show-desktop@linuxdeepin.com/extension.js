@@ -15,19 +15,19 @@ const AppDisplay = imports.ui.appDisplay;
 const AltTab = imports.ui.altTab;
 const Gio = imports.gi.Gio;
 
-//const PANEL_ICON_SIZE = 24;
-//const SPINNER_ANIMATION_TIME = 1;
+let panelNaturalHeight;
+let panelMinHeight;
+let iconPaddingY;
+let iconSize;
 
 function ShowDesktopButton() {
     this._init();
 }
 
 ShowDesktopButton.prototype = {
-//    __proto__ : ShowDesktopButton.prototype,
-
     _init: function() {
-        this.actor = new St.Button();
-        let icon = new St.Icon({icon_name: "desktop", icon_size: 24, icon_type: St.IconType.FULLCOLOR});             
+        this.actor = new St.Button( {style_class: 'desktop-icon'});
+        let icon = new St.Icon({icon_name: "desktop", icon_size: iconSize, icon_type: St.IconType.FULLCOLOR});             
         this.actor.add_actor(icon);
         
         this.actor.connect("clicked", Lang.bind(this, this._toggleShowDesktop));
@@ -76,21 +76,14 @@ ShowDesktopButton.prototype = {
     }
 };
 
-//let button;
-//let windowList;
-//let bottomPosition;
-//let appMenu;
-
 function init() {
+    [panelMinHeight, panelNaturalHeight] = Main.panel.actor.get_preferred_height(-1);
+	iconPaddingY = 1;
+    iconSize = Math.floor(panelNaturalHeight - 2 * iconPaddingY) - 1 - 2 * iconPaddingY;
     button = new ShowDesktopButton();
-    // Find out if the bottom panel extension is enabled    
-    let settings = new Gio.Settings({ schema: 'org.gnome.shell' });
-//    let enabled_extensions = settings.get_strv('enabled-extensions');
 }
 
 function enable() {	               
-    // Create a show desktop button   
-    //Main.panel._leftBox.add(button.actor, { x_fill: true, y_fill: true });
     Main.panel._leftBox.insert_actor(button.actor, 1);
 }
 

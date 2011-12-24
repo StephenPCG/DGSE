@@ -1,0 +1,13 @@
+.desktop-icon {
+    transition-duration: 200;
+}
+
+.desktop-icon:hover {
+    border: 1px solid rgba(0,0,0,0.4);
+    background-gradient-direction: vertical;
+    background-gradient-start: rgba(255,255,255,0.2);
+    background-gradient-end: rgba(255,255,255,0.1);
+    color: rgba(0,0,0,0.8);
+    box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.4);
+}
+

@@ -27,21 +27,26 @@ const AltTab = imports.ui.altTab;
 const Gettext = imports.gettext.domain('gnome-shell-extensions');
 const _ = Gettext.gettext;
 
+const THUMBNAIL_DEFAULT_WIDTH = 250;
 const THUMBNAIL_DISAPPEAR_TIMEOUT = 100; // milliseconds
+const TOOLTIP_DISAPPEAR_TIMEOUT = 100; // milliseconds
 
 //hide
 let dockIconSize;
 let panelMinHeight;
 let panelNaturalHeight;
+let panelMinWidth;
+let leftBoxWidth;
+let leftPadding;
 let dockFrameWidth;
 let dockFrameHeight;
 let dockFramePaddingX;
 let dockFramePaddingY;
 let dockIconPaddingY;
-let activitiesButtonWidth;
 let appMenu;
 let dock;
 let dockThumbnailMenu = null;
+let appNameTooltip = null;
 let dockTitleSize = 15;
 let closeButtonSize = 24;
 
@@ -85,7 +90,7 @@ Dock.prototype = {
 
     _showDock: function() {
         let monitor = Main.layoutManager.primaryMonitor;
-        let x = monitor.x + activitiesButtonWidth;
+        let x = monitor.x + leftBoxWidth + leftPadding;
         let y = 0;
         let width = this._nicons * (dockFrameWidth + dockFramePaddingX) + dockFramePaddingX;
         let height = dockFrameHeight + dockFramePaddingY * 2;
@@ -251,6 +256,7 @@ DockIcon.prototype = {
         this._dock=dock;
 
         this.hasHoverMenu = false;
+        this.hasTooltipMenu = false;
     },
 
     enableHoverMenu: function() {
@@ -259,6 +265,14 @@ DockIcon.prototype = {
 
     disableHoverMenu: function() {
         this.hasHoverMenu = false;
+    },
+
+    enableTooltipMenu: function() {
+        this.hasTooltipMenu = true;
+    },
+
+    disableTooltipMenu: function() {
+        this.hasTooltipMenu = false;
     },
 
     _onDestroy: function() {
@@ -282,12 +296,25 @@ DockIcon.prototype = {
     },
 
     popupThumbnailMenu: function() {
-        if (this.app.get_windows().length >= 1 && !this.hasHoverMenu) {
-            if (dockThumbnailMenu) {
-                dockThumbnailMenu.close();
-            }
+        // If application's windows more than one.
+        if (this.app.get_windows().length >= 1) {
+            // If hover menu haven't popup.
+            if (!this.hasHoverMenu) {
+                if (dockThumbnailMenu) {
+                    dockThumbnailMenu.close();
+                }
 
-            dockThumbnailMenu = new AppThumbnailHoverMenu(this);
+                dockThumbnailMenu = new AppThumbnailHoverMenu(this);
+            }
+            // Show application name if application haven't windows.
+        } else {
+			if (!this.hasTooltipMenu) {
+				if (appNameTooltip) {
+					appNameTooltip.close();
+				}
+				
+				appNameTooltip = new AppNameTooltip(this);
+			}
         }
     },
 
@@ -624,6 +651,85 @@ HoverMenu.prototype = {
     }
 };
 
+function AppNameTooltip () {
+    this._init.apply(this, arguments);
+}
+
+AppNameTooltip.prototype = {
+    __proto__: HoverMenu.prototype,
+	
+    _init: function(dockIcon) {
+		
+        HoverMenu.prototype._init.call(this, dockIcon.actor, { reactive: true });
+
+        this.dockIcon = dockIcon;
+
+		this.appNameTooltipItem = new AppNameTooltipItem(dockIcon);
+		this.addMenuItem(this.appNameTooltipItem);
+		
+        this.closeFlag = false;
+		
+        this.dockIcon.actor.reactive = true;
+        this.dockIcon.actor.connect('enter-event', Lang.bind(this, this.openMenu));
+        this.dockIcon.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+
+		this.openMenu();
+	},
+	
+    open: function(animate) {
+        PopupMenu.PopupMenu.prototype.open.call(this, animate);
+    },
+
+    close: function(animate) {
+        this.dockIcon.disableTooltipMenu();
+        PopupMenu.PopupMenu.prototype.close.call(this, animate);
+    },
+
+    openMenu: function() {
+        if (!this.isOpen) {
+            this.dockIcon.enableTooltipMenu();
+            this.open(true);
+        }
+    },
+
+    closeMenu: function() {
+        this.close(true);
+    },
+
+    requestCloseMenu: function() {
+        this.closeFlag = true;
+
+        Mainloop.timeout_add(
+            TOOLTIP_DISAPPEAR_TIMEOUT,
+            Lang.bind(this, function() {
+                          if (this.closeFlag) {
+                              this.closeMenu();
+                          }
+
+                          return false;         // don't repeat in Mainloop.timeout
+                      })
+        );
+    }
+};
+
+function AppNameTooltipItem() {
+    this._init.apply(this, arguments);
+}
+
+AppNameTooltipItem.prototype = {
+    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+    _init: function (dockIcon, params) {
+        params = Params.parse(params, { hover: false });
+        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
+		
+        this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: dockIcon.app.get_name() });
+		this.addActor(this.text);
+		
+		this.actor.add_style_class_name('dock-appname-tooltip-item');
+	}
+};
+
 function AppThumbnailHoverMenu() {
     this._init.apply(this, arguments);
 }
@@ -647,6 +753,8 @@ AppThumbnailHoverMenu.prototype = {
 
         this.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
         this.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+		
+		this.openMenu();
     },
 
     open: function(animate) {
@@ -716,7 +824,8 @@ PopupMenuAppSwitcherItem.prototype = {
         this.thumbnailPaddingX = 10;
         this.thumbnailPaddingY = 10;
         this.thumbnailFontSize = Math.max(closeButtonSize, dockTitleSize);
-        this.thumbnailWidth = this.thumbnailWindowWidth / 5;
+        // this.thumbnailWidth = this.thumbnailWindowWidth / 5;
+        this.thumbnailWidth = THUMBNAIL_DEFAULT_WIDTH;
         this.thumbnailHeight = this.thumbnailWidth * (this.monitorHeight / this.monitorWidth);
 
         // Those attributes need calculate dynamically.
@@ -940,13 +1049,14 @@ function init(extensionMeta) {
 
     // Init dock.
     appMenu = Main.panel._appMenu;
-    activitiesButtonWidth = Main.panel._activitiesButton.actor.get_width();
     dockFramePaddingX = 2;
     dockFramePaddingY = 1;
     dockIconPaddingY = 1;
     [panelMinHeight, panelNaturalHeight] = Main.panel.actor.get_preferred_height(-1);
+    leftBoxWidth = Main.panel._leftBox.get_width();
     dockFrameHeight = Math.floor(panelNaturalHeight - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
     dockFrameWidth = Math.floor(dockFrameHeight * 3 / 2);
+    leftPadding = dockFrameWidth * 2 / 3;
     dockIconSize = dockFrameHeight - 2 * dockIconPaddingY;
 }
 
