@@ -15,6 +15,11 @@ const AppDisplay = imports.ui.appDisplay;
 const AltTab = imports.ui.altTab;
 const Gio = imports.gi.Gio;
 
+let panelNaturalHeight;
+let panelMinHeight;
+let iconPaddingY;
+let iconSize;
+
 function ShowDesktopButton() {
     this._init();
 }
@@ -22,8 +27,7 @@ function ShowDesktopButton() {
 ShowDesktopButton.prototype = {
     _init: function() {
         this.actor = new St.Button( {style_class: 'desktop-icon'});
-        this.actor.set_size(48, 32);
-        let icon = new St.Icon({icon_name: "desktop", icon_size: 30, icon_type: St.IconType.FULLCOLOR});             
+        let icon = new St.Icon({icon_name: "desktop", icon_size: iconSize, icon_type: St.IconType.FULLCOLOR});             
         this.actor.add_actor(icon);
         
         this.actor.connect("clicked", Lang.bind(this, this._toggleShowDesktop));
@@ -73,6 +77,9 @@ ShowDesktopButton.prototype = {
 };
 
 function init() {
+    [panelMinHeight, panelNaturalHeight] = Main.panel.actor.get_preferred_height(-1);
+	iconPaddingY = 1;
+    iconSize = Math.floor(panelNaturalHeight - 2 * iconPaddingY) - 1 - 2 * iconPaddingY;
     button = new ShowDesktopButton();
 }
 
