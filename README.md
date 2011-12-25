@@ -31,43 +31,22 @@ DGSE, written by Linux Deepin developing team,can be used to other distros' GNOM
 
 ### Extensions' features discription
 
-classic-systray@linuxdeepin.com: Import new Deepin gnome shell extensions.
-
-debian: Rename uuid of user-theme.
-
-dock@linuxdeepin.com: Show application name when the application doesn't have a activated window.
-
-drive-menu@linuxdeepin.com: Ajust popup menu position with the icon's center place.
-	
-hide-dash@linuxdeepin.com: Hide Dash's Favorite bar.
-
-hide-username@linuxdeepin.com: Hide login user name,just left an user status icon in the top-right screen.
-
-no-a11y@linuxdeepin.com: Import new deepin gnome sshell extensions.
-
-no-click-tab@linuxdeepin.com: Switch app category in the dash without the mouse click.
-
-record-desktop@linuxdeepin.com: An app shortcut in the "Deepin Dock" bar of Recording desktop. This extension
-can enable "Ctrl+Shift+Alt+R" keyboard pattern built-in GNOME Shell.
-
-show-desktop@linuxdeepin.com: Show desktop extension.
-
-shutdown-menu@linuxdeepin.com: Alternate the user status "Hibernation" with "Shuttdown" .
-
-system-monitor: Display reletive system info,such as CPU,Memory info,Swap,etc.
-
-user-theme:Deepin GNOME Shell theme.
-
-windowoverlay-icons@linuxdeepin.com: When users press Super key, the apps' preview windows will show windows 
-overlay-icons. 
-
-windows-alt-tab@linuxdeepin.com: when press "Alt+Tab", users can press highlight numbers to switch workspace quickly.
-
-windows-navigator@linuxdeepin.com: It is useful for windows navigator. 
-
-workspace-navigator@linuxdeepin.com: It is useful for workspace navigator.
-
-xrandr@linuxdeepin.com: Initial commit, add README.md.
+noa11y extension: 
+User themes extension: 
+Monitor Status extension: 
+hidedash extension: Hide login user name,just left an user status icon in the top-right screen.
+Dock extension: Deepin dock. It's placed at the top panel of Deepin Gnome Shell. 
+sytem-monitor extension: 
+windowNavigator extension: 
+nocliktab extension: 
+hideusername extension: 
+Show Desktop Button extension: for showing desktop. 
+Removable Drive Menu extension: 
+Windows Alt Tab extension: 
+WindowsOverlay Icons extension: 
+Shutdown Menu extension: 
+Workspace Navigator extension: 
+gnome-shell-classic-systray extension:
 
 ### Install:
 
