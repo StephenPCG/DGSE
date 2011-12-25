@@ -4,24 +4,23 @@ DGSE, written by Linux Deepin developing team,can be used to other distros' GNOM
 
 ### DGSE List: 
 
-* classic-systray@linuxdeepin.com
-* debian   
-* dock@linuxdeepin.com
-* drive-menu@linuxdeepin.com	
-* hide-dash@linuxdeepin.com	
-* hide-username@linuxdeepin.com	
-* no-a11y@linuxdeepin.com
-* no-click-tab@linuxdeepin.com
-* record-desktop@linuxdeepin.com
-* show-desktop@linuxdeepin.com
-* shutdown-menu@linuxdeepin.com
-* system-monitor
-* user-theme	
-* windowoverlay-icons@linuxdeepin.com
-* windows-alt-tab@linuxdeepin.com
-* windows-navigator@linuxdeepin.com 
-* workspace-navigator@linuxdeepin.com 	
-* xrandr@linuxdeepin.com
+* noa11y extension
+* User themes extension
+* Monitor Status extension
+* hidedash extension
+* Dock extension
+* sytem-monitor extension
+* windowNavigator extension
+* nocliktab extension
+* hideusername extension
+* Show Desktop Button extension
+* Removable Drive Menu extension
+* Windows Alt Tab extension
+* WindowsOverlay Icons extension
+* Shutdown Menu extension
+* Workspace Navigator extension
+* gnome-shell-classic-systray extension
+
 
 ### ScreenShots
 
