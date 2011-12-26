@@ -1221,12 +1221,12 @@ function init(extensionMeta) {
     // Init dock.
     appMenu = Main.panel._appMenu;
     dockFramePaddingX = 2;
-    dockFramePaddingY = 1;
-    dockIconPaddingY = 1;
+    dockFramePaddingY = 0;
+    dockIconPaddingY = 2;
     [panelMinHeight, panelNaturalHeight] = Main.panel.actor.get_preferred_height(-1);
     leftBoxWidth = Main.panel._leftBox.get_width();
-    dockFrameHeight = Math.floor(panelNaturalHeight - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
-    dockFrameWidth = Math.floor(dockFrameHeight * 3 / 2);
+    dockFrameHeight = Math.floor(panelNaturalHeight - 2 * dockFramePaddingY); // panel border is 1, so adjust 1
+    dockFrameWidth = Math.floor(dockFrameHeight * 1.6);
     leftOffset = -16;           // _leftBox looks have padding at right, so i add this offset
     dockIconSize = dockFrameHeight - 2 * dockIconPaddingY;
 }
