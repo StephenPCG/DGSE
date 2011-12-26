@@ -109,38 +109,53 @@ ShowDesktopIcon.prototype = {
 
     _toggleShowDesktop: function() {
         let metaWorkspace = global.screen.get_active_workspace();
-        let windows = metaWorkspace.list_windows();
+        let workspaceWindows = metaWorkspace.list_windows();
+		
+		// If workspaceWindows length less than 2, haven't window on current workspace.
+        if (workspaceWindows.length > 2) {
+            let windows = workspaceWindows.splice(0, workspaceWindows.length - 1); // remove desktop window
 
-        if (this._desktopShown) {
-            for ( let i = 0; i < windows.length; ++i ) {
-                if (this._tracker.is_window_interesting(windows[i])){
-                    let shouldrestore = true;
-                    for (let j = 0; j < this._alreadyMinimizedWindows.length; j++) {
-                        if (windows[i] == this._alreadyMinimizedWindows[j]) {
-                            shouldrestore = false;
-                            break;
+            // Test all windows.
+            let allWindowsMinimized = true;
+            for (let j = 0; j < windows.length; j++) {
+                if (!windows[j].minimized) {
+                    allWindowsMinimized = false;
+                    break;
+                }
+            }
+
+            if (allWindowsMinimized || this._desktopShown) {
+                for ( let i = 0; i < windows.length; ++i ) {
+                    if (this._tracker.is_window_interesting(windows[i])){
+                        let shouldrestore = true;
+                        for (let j = 0; j < this._alreadyMinimizedWindows.length; j++) {
+                            if (windows[i] == this._alreadyMinimizedWindows[j]) {
+                                shouldrestore = false;
+                                break;
+                            }
+                        }
+                        if (shouldrestore) {
+                            windows[i].unminimize();
                         }
                     }
-                    if (shouldrestore) {
-                        windows[i].unminimize();
+                }
+                this._alreadyMinimizedWindows.length = []; //Apparently this is better than this._alreadyMinimizedWindows = [];
+
+                this._desktopShown = false;
+            } else {
+                for ( let i = 0; i < windows.length; ++i ) {
+                    if (this._tracker.is_window_interesting(windows[i])){
+                        if (!windows[i].minimized) {
+                            windows[i].minimize();
+                        } else {
+                            this._alreadyMinimizedWindows.push(windows[i]);
+                        }
                     }
                 }
-            }
-            this._alreadyMinimizedWindows.length = []; //Apparently this is better than this._alreadyMinimizedWindows = [];
-        }
-        else {
-            for ( let i = 0; i < windows.length; ++i ) {
-                if (this._tracker.is_window_interesting(windows[i])){
-                    if (!windows[i].minimized) {
-                        windows[i].minimize();
-                    }
-                    else {
-                        this._alreadyMinimizedWindows.push(windows[i]);
-                    }
-                }
+
+                this._desktopShown = true;
             }
         }
-        this._desktopShown = !this._desktopShown;
     }
 };
 
