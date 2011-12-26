@@ -110,8 +110,8 @@ ShowDesktopIcon.prototype = {
     _toggleShowDesktop: function() {
         let metaWorkspace = global.screen.get_active_workspace();
         let workspaceWindows = metaWorkspace.list_windows();
-		
-		// If workspaceWindows length less than 2, haven't window on current workspace.
+
+        // If workspaceWindows length less than 2, haven't window on current workspace.
         if (workspaceWindows.length > 2) {
             let windows = workspaceWindows.splice(0, workspaceWindows.length - 1); // remove desktop window
 
@@ -364,6 +364,7 @@ DockIcon.prototype = {
 
         this.hasHoverMenu = false;
         this.hasTooltipMenu = false;
+		this.popupRightMenu = false;
     },
 
     enableHoverMenu: function() {
@@ -397,7 +398,7 @@ DockIcon.prototype = {
     },
 
     _hoverChanged: function(actor) {
-        this.popupThumbnailMenu();
+		this.popupThumbnailMenu();
 
         return false;
     },
@@ -445,9 +446,11 @@ DockIcon.prototype = {
         let button = event.get_button();
         if (button == 1) {
             this._removeMenuTimeout();
-            this._menuTimeoutId = Mainloop.timeout_add(AppDisplay.MENU_POPUP_TIMEOUT, Lang.bind(this, function() {
-                                                                                                    this.popupMenu();
-                                                                                                }));
+            this._menuTimeoutId = Mainloop.timeout_add(
+                AppDisplay.MENU_POPUP_TIMEOUT,
+                Lang.bind(this, function() {
+                              this.popupMenu();
+                          }));
         } else if (button == 3) {
             this.popupMenu();
         }
@@ -465,6 +468,7 @@ DockIcon.prototype = {
             this.emit('launching');
             this.app.open_new_window(-1);
         }
+		
         return false;
     },
 

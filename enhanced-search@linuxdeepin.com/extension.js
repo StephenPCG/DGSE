@@ -109,7 +109,7 @@ SearchEngineProvider.prototype = {
     },
 
     listSearchEngine: function(terms) {
-        let searchString = encodeURIComponent(terms);
+        let searchString = encodeURIComponent(terms.join(' '));
 
         for (let i = 0; i < SEARCH_ENGINES.length; i++) {
             SEARCH_ENGINES[i].search = searchString;
