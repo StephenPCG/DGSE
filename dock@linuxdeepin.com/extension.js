@@ -37,7 +37,7 @@ let panelMinHeight;
 let panelNaturalHeight;
 let panelMinWidth;
 let leftBoxWidth;
-let leftPadding;
+let leftOffset;
 let dockFrameWidth;
 let dockFrameHeight;
 let dockFramePaddingX;
@@ -54,6 +54,95 @@ let panelConnectId;
 let panel;
 
 let dateMenu, label, box;
+
+function ShowDesktopIcon() {
+    this._init();
+}
+
+ShowDesktopIcon.prototype = {
+    _init: function() {
+        this.actor = new St.Button({ style_class: 'dock-app',
+                                     button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
+                                     reactive: true,
+                                     can_focus: true,
+                                     x_fill: false,
+                                     y_fill: false,
+                                     track_hover: true});
+        this.actor.set_size(dockFrameWidth, dockFrameHeight);
+        this._icon = new St.Icon({icon_name: "desktop", icon_size: dockIconSize, icon_type: St.IconType.FULLCOLOR});
+        this.actor.add_actor(this._icon);
+        this.actor.connect('notify::hover', Lang.bind(this, this._hoverChanged));
+
+        this.actor.connect("clicked", Lang.bind(this, this._toggleShowDesktop));
+
+        this._tracker = Shell.WindowTracker.get_default();
+
+        this._desktopShown = false;
+
+        this._alreadyMinimizedWindows = [];
+        this.hasTooltipMenu = false;
+    },
+
+    enableTooltipMenu: function() {
+        this.hasTooltipMenu = true;
+    },
+
+    disableTooltipMenu: function() {
+        this.hasTooltipMenu = false;
+    },
+
+    _hoverChanged: function(actor) {
+        this.popupTooltipMenu();
+
+        return false;
+    },
+
+    popupTooltipMenu: function() {
+        if (!this.hasTooltipMenu) {
+            if (appNameTooltip) {
+                appNameTooltip.close();
+            }
+
+            appNameTooltip = new ShowDesktopTooltip(this);
+        }
+    },
+
+    _toggleShowDesktop: function() {
+        let metaWorkspace = global.screen.get_active_workspace();
+        let windows = metaWorkspace.list_windows();
+
+        if (this._desktopShown) {
+            for ( let i = 0; i < windows.length; ++i ) {
+                if (this._tracker.is_window_interesting(windows[i])){
+                    let shouldrestore = true;
+                    for (let j = 0; j < this._alreadyMinimizedWindows.length; j++) {
+                        if (windows[i] == this._alreadyMinimizedWindows[j]) {
+                            shouldrestore = false;
+                            break;
+                        }
+                    }
+                    if (shouldrestore) {
+                        windows[i].unminimize();
+                    }
+                }
+            }
+            this._alreadyMinimizedWindows.length = []; //Apparently this is better than this._alreadyMinimizedWindows = [];
+        }
+        else {
+            for ( let i = 0; i < windows.length; ++i ) {
+                if (this._tracker.is_window_interesting(windows[i])){
+                    if (!windows[i].minimized) {
+                        windows[i].minimize();
+                    }
+                    else {
+                        this._alreadyMinimizedWindows.push(windows[i]);
+                    }
+                }
+            }
+        }
+        this._desktopShown = !this._desktopShown;
+    }
+};
 
 function Dock() {
     this._init.apply(this, arguments);
@@ -90,7 +179,7 @@ Dock.prototype = {
 
     _showDock: function() {
         let monitor = Main.layoutManager.primaryMonitor;
-        let x = monitor.x + leftBoxWidth + leftPadding;
+        let x = monitor.x + leftBoxWidth + leftOffset;
         let y = 0;
         let width = this._nicons * (dockFrameWidth + dockFramePaddingX) + dockFramePaddingX;
         let height = dockFrameHeight + dockFramePaddingY * 2;
@@ -146,13 +235,16 @@ Dock.prototype = {
     _redisplay: function () {
         this.removeAll();
 
+
         let favorites = AppFavorites.getAppFavorites().getFavoriteMap();
 
         let running = this._appSystem.get_running();
         let runningIds = this._appIdListToHash(running);
 
-        let icons = 0;
+        let showDesktopIcon = new ShowDesktopIcon();
+        this.addItem(showDesktopIcon.actor);
 
+        let icons = 0;
         let nFavorites = 0;
         for (let id in favorites) {
             let app = favorites[id];
@@ -308,13 +400,13 @@ DockIcon.prototype = {
             }
             // Show application name if application haven't windows.
         } else {
-			if (!this.hasTooltipMenu) {
-				if (appNameTooltip) {
-					appNameTooltip.close();
-				}
-				
-				appNameTooltip = new AppNameTooltip(this);
-			}
+            if (!this.hasTooltipMenu) {
+                if (appNameTooltip) {
+                    appNameTooltip.close();
+                }
+
+                appNameTooltip = new AppNameTooltip(this);
+            }
         }
     },
 
@@ -657,25 +749,25 @@ function AppNameTooltip () {
 
 AppNameTooltip.prototype = {
     __proto__: HoverMenu.prototype,
-	
+
     _init: function(dockIcon) {
-		
+
         HoverMenu.prototype._init.call(this, dockIcon.actor, { reactive: true });
 
         this.dockIcon = dockIcon;
 
-		this.appNameTooltipItem = new AppNameTooltipItem(dockIcon);
-		this.addMenuItem(this.appNameTooltipItem);
-		
+        this.appNameTooltipItem = new AppNameTooltipItem(dockIcon);
+        this.addMenuItem(this.appNameTooltipItem);
+
         this.closeFlag = false;
-		
+
         this.dockIcon.actor.reactive = true;
         this.dockIcon.actor.connect('enter-event', Lang.bind(this, this.openMenu));
         this.dockIcon.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
 
-		this.openMenu();
-	},
-	
+        this.openMenu();
+    },
+
     open: function(animate) {
         PopupMenu.PopupMenu.prototype.open.call(this, animate);
     },
@@ -722,12 +814,12 @@ AppNameTooltipItem.prototype = {
     _init: function (dockIcon, params) {
         params = Params.parse(params, { hover: false });
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
-		
+
         this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: dockIcon.app.get_name() });
-		this.addActor(this.text);
-		
-		this.actor.add_style_class_name('dock-appname-tooltip-item');
-	}
+        this.addActor(this.text);
+
+        this.actor.add_style_class_name('dock-appname-tooltip-item');
+    }
 };
 
 function AppThumbnailHoverMenu() {
@@ -753,8 +845,8 @@ AppThumbnailHoverMenu.prototype = {
 
         this.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
         this.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
-		
-		this.openMenu();
+
+        this.openMenu();
     },
 
     open: function(animate) {
@@ -1037,6 +1129,85 @@ MyBox.prototype = {
     }
 };
 
+function ShowDesktopTooltip () {
+    this._init.apply(this, arguments);
+}
+
+ShowDesktopTooltip.prototype = {
+    __proto__: HoverMenu.prototype,
+
+    _init: function(dockIcon) {
+
+        HoverMenu.prototype._init.call(this, dockIcon.actor, { reactive: true });
+
+        this.dockIcon = dockIcon;
+
+        this.appNameTooltipItem = new ShowDesktopTooltipItem();
+        this.addMenuItem(this.appNameTooltipItem);
+
+        this.closeFlag = false;
+
+        this.dockIcon.actor.reactive = true;
+        this.dockIcon.actor.connect('enter-event', Lang.bind(this, this.openMenu));
+        this.dockIcon.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+
+        this.openMenu();
+    },
+
+    open: function(animate) {
+        PopupMenu.PopupMenu.prototype.open.call(this, animate);
+    },
+
+    close: function(animate) {
+        this.dockIcon.disableTooltipMenu();
+        PopupMenu.PopupMenu.prototype.close.call(this, animate);
+    },
+
+    openMenu: function() {
+        if (!this.isOpen) {
+            this.dockIcon.enableTooltipMenu();
+            this.open(true);
+        }
+    },
+
+    closeMenu: function() {
+        this.close(true);
+    },
+
+    requestCloseMenu: function() {
+        this.closeFlag = true;
+
+        Mainloop.timeout_add(
+            TOOLTIP_DISAPPEAR_TIMEOUT,
+            Lang.bind(this, function() {
+                          if (this.closeFlag) {
+                              this.closeMenu();
+                          }
+
+                          return false;         // don't repeat in Mainloop.timeout
+                      })
+        );
+    }
+};
+
+function ShowDesktopTooltipItem() {
+    this._init.apply(this, arguments);
+}
+
+ShowDesktopTooltipItem.prototype = {
+    __proto__: PopupMenu.PopupBaseMenuItem.prototype,
+
+    _init: function (params) {
+        params = Params.parse(params, { hover: false });
+        PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
+
+        this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: "Show Desktop" });
+        this.addActor(this.text);
+
+        this.actor.add_style_class_name('dock-appname-tooltip-item');
+    }
+};
+
 function init(extensionMeta) {
     imports.gettext.bindtextdomain('gnome-shell-extensions', extensionMeta.localedir);
 
@@ -1056,7 +1227,7 @@ function init(extensionMeta) {
     leftBoxWidth = Main.panel._leftBox.get_width();
     dockFrameHeight = Math.floor(panelNaturalHeight - 2 * dockFramePaddingY) - 1; // panel border is 1, so adjust 1
     dockFrameWidth = Math.floor(dockFrameHeight * 3 / 2);
-    leftPadding = dockFrameWidth * 2 / 3;
+    leftOffset = -16;           // _leftBox looks have padding at right, so i add this offset
     dockIconSize = dockFrameHeight - 2 * dockIconPaddingY;
 }
 
