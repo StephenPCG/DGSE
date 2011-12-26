@@ -1,6 +1,6 @@
 # DGSE(Deepin Gnome-Shell Extensions)
 
-DGSE, written by Linux Deepin developing team,can be used to other distros' GNOME Shell environment than Linux Deepin.
+DGSE, written by Linux Deepin team, can also be used in other distros' GNOME Shell environment.
 
 ### DGSE List: 
 
@@ -21,7 +21,6 @@ DGSE, written by Linux Deepin developing team,can be used to other distros' GNOM
 * Workspace Navigator extension
 * gnome-shell-classic-systray extension
 
-
 ### ScreenShots
 
 ![alt Linux Deepin desktop screenshot](http://i.imgur.com/qaIVQ.jpg)
@@ -31,66 +30,59 @@ DGSE, written by Linux Deepin developing team,can be used to other distros' GNOM
 
 ### Extensions' features discription
 
-noa11y extension: 
-User themes extension: 
-Monitor Status extension: 
-hidedash extension: Hide login user name,just left an user status icon in the top-right screen.
-Dock extension: Deepin dock. It's placed at the top panel of Deepin Gnome Shell. 
-sytem-monitor extension: 
-windowNavigator extension: 
-nocliktab extension: 
-hideusername extension: 
-Show Desktop Button extension: for showing desktop. 
-Removable Drive Menu extension: 
-Windows Alt Tab extension: 
-WindowsOverlay Icons extension: 
-Shutdown Menu extension: 
-Workspace Navigator extension: 
-gnome-shell-classic-systray extension:
+#### noa11y extension
+Don't display a11y icon in systray (this is borrowed from gnome official team)
+(screenshot should go here)
+#### User themes extension
+Enable uesr theme (this is borrowed from gnome official team)
+#### Monitor Status extension
+Display an icon in systray to enable quick adjust the monitor status
+(screenshot should go here)
+#### hidedash extension
+Don't show dash (the original favourite bar in overview panel)
+#### Dock extension
+Deepin dock, it's placed at the top panel of Deepin Gnome Shell 
+(screenshot should go here)
+#### sytem-monitor extension
+Shows system monitor (on mem/cpu/net/disk/temp/etc.) in the systray (this is borrowed from paradoxxxzero)
+####windowNavigator extension
+(description)
+#### nocliktab extension
+No need to click on the tab in overview panel, mouse over alone is enough for navigation
+#### hideusername extension
+Hide login user name, just show the user login status
+#### Show Desktop Button extension
+Put a show-desktop button on the top panel (will be removed soon)
+#### Removable Drive Menu extension
+Put an icon in systray which allows you to quick umount mounted drives
+(screenshot should go here)
+#### Windows Alt Tab extension
+Enhanced alternative alt-tab, allows you to switch apps/workspace efficiently
+(more detailed description should go here)
+(screenshot should go here)
+#### WindowsOverlay Icons extension
+Displays an application icon on each window preview in overview panel
+(screenshot should go here)
+#### Shutdown Menu extension
+Alternative shutdown menu (this is borrowed from mgse)
+#### Workspace Navigator extension
+(description should go here)
+#### gnome-shell-classic-systray extension
+(description should go here)
 
 ### Install:
+It's quite easy to install dgse, just type ./install.sh in the source directory. All extensions will be installed in the user's home directory ($HOME/.local/share/gnome-shell/extensions/). Note that, we have to copy two gschema xml file into /usr, so sudo privilege is required during installation. If an extension is already installed before you run install.sh, it will be updated automatically. At last, don't forget to reload GNOME Shell (press "Alt-F2", then "r", then "Return")to load the installed extensions.
 
-the following method can be used for all the GNOME Shell users.
-
-Tips: you would better enable all the installed GNOME Shell extensions via gnome tweak tool. 
-
-	git clone git://github.com/manateelazycat/DGSE.git
-	mv DGSE/* ~/.local/share/gnome-shell/extensions
-	ln -s system-monitor/system-monitor@linuxdeepin.com/ .
-	ln -s user-theme/user-theme@gnome-shell-extensions.gnome.org/ .
-	
-Then you can use gnome tweak tool to enable the DGSE.
-
-But if you want to totally experience the Deepin GNOME Shell,there is  something to do:
-
-	git clone git://github.com/manateelazycat/deepin-gnome-shell.git
-	sudo rm -rf /usr/share/gnome-shell/js/ui/ 
-	sudo mv deepin-gnome-shell/js/ui /usr/share/gnome-shell/js/
-
-Then you should download deepin-gs-theme
+It is recommended to install deepin-gs-theme as well:
 
 	git clone git://github.com/manateelazycat/deepin-gs-theme
-	mv deepin-gs-theme/ ~/.themes
+	cp -r deepin-gs-theme/ ~/.themes/Deepin
 
-Last, press "Alt+F2", input "r", reload the GNOME Shell.
+After the theme dir is copied, you can enabled it in gnome-tweak-tool.
 
-Just Enjoy it!
+Enjoy it!
 
 ### BUGS
 
-IF bugs when using Linux Deepin, users can report them at <http://www.linuxdeepin.com/forum>.
+If any bug occurs, please report to http://www.linuxdeepin.com/forum/
 
-### License:
-
-Copyright (C) 2011 Linux Deepin team
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public 
-License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later 
-version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied 
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with this program. If not, see 
-<http://www.gnu.org/licenses/>.
-  
