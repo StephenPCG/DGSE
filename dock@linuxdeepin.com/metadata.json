@@ -1,9 +1,7 @@
 {
-"uuid": "dock@linuxdeepin.com",
-"name": "Dock",
-"description": "A dock for the GNOME Shell -- displays favorite and running applications",
-"original-author": "tclaesson@gmail.com",
-"shell-version": [ "3.2" ],
-"localedir": "@LOCALEDIR@",
-"url": "@url@"
+    "shell-version": [ "3.2" ],
+    "uuid": "dock@linuxdeepin.com",
+    "name": "Deepin Enhanced Dock",
+    "description": "Deepin Enhanced Dock",
+    "url": "http://www.linuxdeepin.com"
 }

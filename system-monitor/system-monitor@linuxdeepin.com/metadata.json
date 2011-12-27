@@ -1,7 +1,7 @@
 {
     "shell-version": ["3.2.0", "3.2"],
     "uuid": "system-monitor@linuxdeepin.com",
-    "name": "system-monitor",
-    "url": "https://github.com/paradoxxxzero/gnome-shell-system-monitor-applet",
+    "name": "System Monitor",
+    "url": "http://www.linuxdeepin.com",
     "description": "Display system informations in gnome shell status bar, such as memory usage, cpu usage, network rates…"
 }
