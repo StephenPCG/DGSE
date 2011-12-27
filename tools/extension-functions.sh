@@ -1,7 +1,7 @@
 #!/bin/bash
 
 refresh_extensions_status() {
-    ENABLED_EXTENSION_IDS=( $(gsettings get org.gnome.shell enabled-extensions | grep -oE "[^']*@[^']*") )
+    ENABLED_EXTENSION_IDS=( $(gsettings get org.gnome.shell enabled-extensions | grep -oE "[^']+@[^']+") )
     INSTALLED_EXTENSION_DIRS=( $(ls -d {$HOME/.local,/usr/local,/usr}/share/gnome-shell/extensions/*@* 2>/dev/null) )
 }
 
@@ -61,8 +61,9 @@ enable_extension() {
 	for id in ${ENABLED_EXTENSION_IDS[@]}; do
 	    [[ $id != $ext_id ]] && new_enabled_extension_ids="${new_enabled_extension_ids}, '${id}'"
 	done
-	new_enabled_extension_ids="[${new_enabled_extension_ids##,}, '$ext_id' ]"
-	gsettings set org.gnome.shell enabled-extensions "$new_enabled_extension_ids"
+	new_enabled_extension_ids="${new_enabled_extension_ids##,}, '$ext_id'"
+	new_enabled_extension_ids="[ ${new_enabled_extension_ids##,} ]"
+	gsettings set org.gnome.shell enabled-extensions "${new_enabled_extension_ids}"
     fi
 }
 
@@ -79,7 +80,7 @@ disable_extension() {
 	for id in ${ENABLED_EXTENSION_IDS[@]}; do
 	    [[ $id != $ext_id ]] && new_enabled_extension_ids="${new_enabled_extension_ids}, '${id}'"
 	done
-	new_enabled_extension_ids="[${new_enabled_extension_ids##,} ]"
+	new_enabled_extension_ids="[ ${new_enabled_extension_ids##,} ]"
 	gsettings set org.gnome.shell enabled-extensions "$new_enabled_extension_ids"
     fi
 }
@@ -134,6 +135,7 @@ show_extension_details() {
 	done) | column -s\| -t
     else
 	(printf "%s|%s\n" "Key" "Value"
+	refresh_extensions_status
 	while [ $# -gt 0 ]; do
 	    _show_extension_details $1
 	    shift
