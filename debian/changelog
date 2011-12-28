@@ -1,3 +1,18 @@
+deepin-gse (1.0.10-1) oneiric; urgency=low
+
+  * Add Enchanced Search Extension
+  * Add Record Desktop Extension
+  * Remove show-desktop extension
+  * many other upstream updates
+
+ -- Zhang Cheng <zhangcheng@linuxdeepin.com>  Wed, 28 Dec 2011 15:26:56 +0800
+
+deepin-gse (1.0.9-1) oneiric; urgency=low
+
+  * Update dock extension
+
+ -- Zhang Cheng <zhangcheng@linuxdeepin.com>  Fri, 23 Dec 2011 13:32:43 +0800
+
 deepin-gse (1.0.8-1) oneiric; urgency=low
 
   * merge move-clock and extend-left-box into dock
