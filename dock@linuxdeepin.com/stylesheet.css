@@ -6,17 +6,8 @@
 .dock-app.running {
     border: 1px solid rgba(0,0,0,0.4);
     background-gradient-direction: vertical;
-    background-gradient-start: rgba(255,255,255,0.8);
+    background-gradient-start: rgba(200,0,0,0.8);
     background-gradient-end: rgba(255,255,255,0.7);
-    color: rgba(0,0,0,0.8);
-    box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.4);
-}
-
-.dock-app.selected {
-    border: 1px solid rgba(0,0,0,0.4);
-    background-gradient-direction: vertical;
-    background-gradient-start: rgba(0,255,255,0.5);
-    background-gradient-end: rgba(0,255,255,0.4);
     color: rgba(0,0,0,0.8);
     box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.4);
 }
@@ -24,8 +15,8 @@
 .dock-app.focused {
     border: 1px solid rgba(0,0,0,0.4);
     background-gradient-direction: vertical;
-    background-gradient-start: rgba(66,255,42,0.6);
-    background-gradient-end: rgba(66,255,42,0.5);
+    background-gradient-start: rgba(0,200,0,0.5);
+    background-gradient-end: rgba(255,255,255,0.4);
     color: rgba(0,0,0,0.8);
     box-shadow: inset 0px 1px 0px 0px rgba(255,255,255,0.4);
 }
@@ -93,3 +84,18 @@
     padding: 10px 0px 0px 6px;
     text-shadow: rgba(255,255,255,0.35) 0px 1px 0px;
 }
+
+.dock-appname-tooltip {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000000;
+}
+
+.dock-appname-tooltip-item {
+    color: rgba(0,0,0,0.8);
+    font-size: 8.5pt;
+    font-weight: bold;
+    padding: 0px 0px 0px 6px;
+    text-shadow: rgba(255,255,255,0.35) 0px 1px 0px;
+}
+
