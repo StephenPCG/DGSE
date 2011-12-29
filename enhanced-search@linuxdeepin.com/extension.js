@@ -27,52 +27,13 @@ const Gio = imports.gi.Gio;
 const Mainloop = imports.mainloop;
 const Search = imports.ui.search;
 
-const SEARCH_ENGINE_GOOGLE = "Google";
-const SEARCH_ENGINE_BAIDU = "Baidu";
-const SEARCH_ENGINE_YAHOO = "Yahoo";
-const SEARCH_ENGINE_BING = "Bing";
-const SEARCH_ENGINE_FLICKR = "Flickr";
-const SEARCH_ENGINE_WIKIPEDIA = "Wikipedia";
-const SEARCH_ENGINE_TWITTER = "Twitter";
-const SEARCH_ENGINE_YOUTUBE = "YouTube";
+const Gettext = imports.gettext;
 
-const SEARCH_ENGINES = [{'uri': "http://www.google.com.hk/search?ie=UTF-8&q=",
-                         'title': SEARCH_ENGINE_GOOGLE,
-						 'icon': "google.png"
-                        },
-                        {'uri': "http://www.baidu.com/s?ie=utf8&wd=",
-                         'title': SEARCH_ENGINE_BAIDU,
-						 'icon': "baidu.png"
-                        },
-                        {'uri': "http://cn.search.yahoo.com/search?ie=UTF-8&p=",
-                         'title': SEARCH_ENGINE_YAHOO,
-						 'icon': "yahoo.png"
-                        },
-                        {'uri': "http://cn.bing.com/search?q=",
-                         'title': SEARCH_ENGINE_BING,
-						 'icon': "bing.png"
-                        },
-                        {'uri': "http://www.flickr.com/search/?f=hp&q=",
-                         'title': SEARCH_ENGINE_FLICKR,
-						 'icon': "flickr.png"
-                        },
-                        {'uri': "http://zh.wikipedia.org/wiki/",
-                         'title': SEARCH_ENGINE_WIKIPEDIA,
-						 'icon': "wikipedia.png"
-                        },
-                        {'uri': "https://twitter.com/search?q=",
-                         'title': SEARCH_ENGINE_TWITTER,
-						 'icon': "twitter.png"
-                        },
-                        {'uri': "http://www.youtube.com/results?search_query=",
-                         'title': SEARCH_ENGINE_YOUTUBE,
-						 'icon': "youtube.png"
-                        }
-                       ];
-
+let searchEngines;
 let searchProvidersBox = null;
 let searchEngineProvider = null;
 let currentPath = null;
+let _;
 
 function SearchEngineProvider() {
     this._init();
@@ -111,11 +72,11 @@ SearchEngineProvider.prototype = {
     listSearchEngine: function(terms) {
         let searchString = encodeURIComponent(terms.join(' '));
 
-        for (let i = 0; i < SEARCH_ENGINES.length; i++) {
-            SEARCH_ENGINES[i].search = searchString;
+        for (let i = 0; i < searchEngines.length; i++) {
+            searchEngines[i].search = searchString;
         }
 
-        return SEARCH_ENGINES;
+        return searchEngines;
     },
 
     /* start asynchronous search for terms */
@@ -129,6 +90,44 @@ SearchEngineProvider.prototype = {
 };
 
 function init(extensionMeta) {
+    let localePath = extensionMeta.path + '/locale';
+    Gettext.bindtextdomain('enhanced-search', localePath);
+    _ = Gettext.domain('enhanced-search').gettext;
+	
+	searchEngines = [{'uri': "http://www.google.com.hk/search?ie=UTF-8&q=",
+                      'title': _("Google"),
+					  'icon': "google.png"
+                     },
+                     {'uri': "http://www.baidu.com/s?ie=utf8&wd=",
+                      'title': _("Baidu"),
+					  'icon': "baidu.png"
+                     },
+                     {'uri': "http://cn.search.yahoo.com/search?ie=UTF-8&p=",
+                      'title': _("Yahoo!"),
+					  'icon': "yahoo.png"
+                     },
+                     {'uri': "http://cn.bing.com/search?q=",
+                      'title': _("Bing"),
+					  'icon': "bing.png"
+                     },
+                     {'uri': "http://www.flickr.com/search/?f=hp&q=",
+                      'title': _("Flickr"),
+					  'icon': "flickr.png"
+                     },
+                     {'uri': "http://zh.wikipedia.org/wiki/",
+                      'title': _("Wikipedia"),
+					  'icon': "wikipedia.png"
+                     },
+                     {'uri': "https://twitter.com/search?q=",
+                      'title': _("Twitter"),
+					  'icon': "twitter.png"
+                     },
+                     {'uri': "http://www.youtube.com/results?search_query=",
+                      'title': _("YouTube"),
+					  'icon': "youtube.png"
+                     }
+                    ];
+
 	searchProvidersBox = Main.overview._viewSelector._searchTab._searchResults._searchProvidersBox;
 	currentPath = extensionMeta.path;
 }
