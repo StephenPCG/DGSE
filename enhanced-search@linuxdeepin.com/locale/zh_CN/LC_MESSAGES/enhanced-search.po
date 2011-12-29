@@ -31,3 +31,6 @@ msgstr "推特"
 
 msgid "YouTube"
 msgstr "YouTube"
+
+msgid "SearchEngine"
+msgstr "[baidu, google, taobao, bing, yahoo, flickr, wikipedia]"
