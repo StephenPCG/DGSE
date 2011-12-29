@@ -1221,7 +1221,7 @@ ShowDesktopTooltipItem.prototype = {
         params = Params.parse(params, { hover: false });
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
 
-        this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: "Show Desktop" });
+        this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: _("Show Desktop") });
         this.addActor(this.text);
 
         this.actor.add_style_class_name('dock-appname-tooltip-item');

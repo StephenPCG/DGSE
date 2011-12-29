@@ -16,3 +16,6 @@ msgstr "從收藏夾移除"
 
 msgid "Add to Favorites"
 msgstr "添加到收藏夾"
+
+msgid "Show Desktop"
+msgstr "顯示桌面"
