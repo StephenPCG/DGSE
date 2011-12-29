@@ -1,7 +1,6 @@
 {
-    "shell-version": ["3.2"], 
-    "uuid": "shutdown-menu@linuxdeepin.com", 
-    "name": "Alternative Shutdown Menu",
-    "description": "Replace Suspend menu with Shutdown and add Suspend/Hibernate to Power Off dialog", 
-    "url": "http://www.linuxdeepin.com/"
+    "shell-version": ["3.2.1"],
+    "uuid": "shutdown-menu@linuxdeepin.com",
+    "name": "Replace original version suspend menu.",
+    "description": "Replace original version suspend menu."
 }

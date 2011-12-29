@@ -98,7 +98,7 @@ function init(extensionMeta) {
                   'title': _("Google"),
                   'icon': "google.png"
                  };
-    let baidu = {'uri': "http://www.baidu.com/s?ie=utf8&wd=",
+    let baidu = {'uri': "http://www1.baidu.com/s?cl=3&tn=ubuntuu_cb&wd=",
                  'title': _("Baidu"),
                  'icon': "baidu.png"
                 };
