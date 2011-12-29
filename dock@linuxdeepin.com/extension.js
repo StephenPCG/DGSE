@@ -414,7 +414,7 @@ DockIcon.prototype = {
 
                 dockThumbnailMenu = new AppThumbnailHoverMenu(this);
             }
-            // Show application name if application haven't windows.
+        // Show application name if application haven't windows.
         } else {
             if (!this.hasTooltipMenu) {
                 if (appNameTooltip) {
