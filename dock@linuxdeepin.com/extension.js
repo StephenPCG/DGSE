@@ -112,7 +112,7 @@ ShowDesktopIcon.prototype = {
         let workspaceWindows = metaWorkspace.list_windows();
 
         // If workspaceWindows length less than 2, haven't window on current workspace.
-        if (workspaceWindows.length > 2) {
+        if (workspaceWindows.length >= 2) {
             let windows = workspaceWindows.splice(0, workspaceWindows.length - 1); // remove desktop window
 
             // Test all windows.
