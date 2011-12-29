@@ -33,7 +33,7 @@ msgid "YouTube"
 msgstr "YouTube"
 
 msgid "[google, bing, yahoo, flickr, wikipedia, twitter, youtube]"
-msgstr "[baidu, google, taobao, bing, yahoo, flickr, wikipedia]"
+msgstr "[baidu, google, bing, yahoo, flickr, wikipedia]"
 
 msgid "Search Engine"
 msgstr "搜索引擎"
