@@ -104,7 +104,7 @@ function init(extensionMeta) {
                 };
 	let taobao = {'uri': "http://s.taobao.com/search?q=",
                  'title': _("Taobao"),
-                 'icon': "baidu.png"
+                 'icon': "taobao.png"
                 };
     let yahoo = {'uri': "http://cn.search.yahoo.com/search?ie=UTF-8&p=",
                  'title': _("Yahoo!"),
