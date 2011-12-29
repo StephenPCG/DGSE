@@ -130,7 +130,7 @@ function init(extensionMeta) {
                    'title': _("YouTube"),
                    'icon': "youtube.png"
                   };
-	searchEngines = eval(_("SearchEngine"));
+	searchEngines = eval(_("[google, bing, yahoo, flickr, wikipedia, twitter, youtube]"));
 
     searchProvidersBox = Main.overview._viewSelector._searchTab._searchResults._searchProvidersBox;
     currentPath = extensionMeta.path;

@@ -32,5 +32,5 @@ msgstr "Twitter"
 msgid "YouTube"
 msgstr "YouTube"
 
-msgid "SearchEngine"
+msgid "[google, bing, yahoo, flickr, wikipedia, twitter, youtube]"
 msgstr "[google, baidu, bing, yahoo, flickr, wikipedia, twitter, youtube]"
