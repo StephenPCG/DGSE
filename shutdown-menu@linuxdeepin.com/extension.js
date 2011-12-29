@@ -37,7 +37,7 @@ function init(extensionMeta) {
     fakeUpdateSuspendOrPowerOff = function() {
         this._haveSuspend = false;
         this._suspendOrPowerOffItem.updateText(_f("Shut Down..."), null);
-    }
+    },
 
     EndSessionDialog.EndSessionDialog.prototype._onHibernate = function() {
         this._stopTimer();
