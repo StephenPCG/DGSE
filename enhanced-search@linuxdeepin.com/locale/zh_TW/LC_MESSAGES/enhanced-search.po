@@ -11,6 +11,9 @@ msgstr "Google"
 msgid "Baidu"
 msgstr "百度"
 
+msgid "Taobao"
+msgstr "淘寶網"
+
 msgid "Yahoo!"
 msgstr "Yahoo!"
 

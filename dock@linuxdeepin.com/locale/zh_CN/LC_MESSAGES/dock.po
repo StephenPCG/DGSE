@@ -6,10 +6,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "New Window"
-msgstr "开启新窗口"
+msgstr "打开新窗口"
 
 msgid "Quit Application"
-msgstr "结束应用"
+msgstr "结束应用程序"
 
 msgid "Remove from Favorites"
 msgstr "从收藏夹移除"
