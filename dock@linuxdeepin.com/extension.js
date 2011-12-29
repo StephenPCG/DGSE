@@ -24,8 +24,7 @@ const Workspace = imports.ui.workspace;
 const AppDisplay = imports.ui.appDisplay;
 const AltTab = imports.ui.altTab;
 
-const Gettext = imports.gettext.domain('gnome-shell-extensions');
-const _ = Gettext.gettext;
+const Gettext = imports.gettext;
 
 const THUMBNAIL_DEFAULT_WIDTH = 250;
 const THUMBNAIL_DISAPPEAR_TIMEOUT = 100; // milliseconds
@@ -49,6 +48,7 @@ let dockThumbnailMenu = null;
 let appNameTooltip = null;
 let dockTitleSize = 15;
 let closeButtonSize = 24;
+let _;
 
 let panelConnectId;
 let panel;
@@ -112,7 +112,7 @@ ShowDesktopIcon.prototype = {
         let workspaceWindows = metaWorkspace.list_windows();
 
         // If workspaceWindows length less than 2, haven't window on current workspace.
-        if (workspaceWindows.length > 2) {
+        if (workspaceWindows.length >= 2) {
             let windows = workspaceWindows.splice(0, workspaceWindows.length - 1); // remove desktop window
 
             // Test all windows.
@@ -864,6 +864,7 @@ AppThumbnailHoverMenu.prototype = {
 
         this.actor.connect('enter-event', Lang.bind(this, this.stayOnMenu));
         this.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+		this.actor.style_class = 'dock-thumbnail-window';
 
         this.openMenu();
     },
@@ -1220,7 +1221,7 @@ ShowDesktopTooltipItem.prototype = {
         params = Params.parse(params, { hover: false });
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
 
-        this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: "Show Desktop" });
+        this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: _("Show Desktop") });
         this.addActor(this.text);
 
         this.actor.add_style_class_name('dock-appname-tooltip-item');
@@ -1228,7 +1229,9 @@ ShowDesktopTooltipItem.prototype = {
 };
 
 function init(extensionMeta) {
-    imports.gettext.bindtextdomain('gnome-shell-extensions', extensionMeta.localedir);
+    let localePath = extensionMeta.path + '/locale';
+    Gettext.bindtextdomain('dock', localePath);
+    _ = Gettext.domain('dock').gettext;
 
     // Init move clock.
     dateMenu = Main.panel._dateMenu;

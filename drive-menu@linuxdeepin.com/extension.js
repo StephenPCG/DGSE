@@ -4,13 +4,14 @@ const Lang = imports.lang;
 const St = imports.gi.St;
 const Shell = imports.gi.Shell;
 
-const Gettext = imports.gettext.domain('gnome-shell-extensions');
-const _ = Gettext.gettext;
+const Gettext = imports.gettext;
 
 const Main = imports.ui.main;
 const Panel = imports.ui.panel;
 const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
+
+let _;
 
 function DriveMenuItem(place) {
     this._init(place);
@@ -91,10 +92,10 @@ DriveMenu.prototype = {
     }
 };
 
-// Put your extension initialization code here
-function init(metadata) {
-    // let me = imports.ui.extensionSystem.extensions[metadata.uuid];
-    // me.convenience.initTranslations(metadata);
+function init(extensionMeta) {
+    let localePath = extensionMeta.path + '/locale';
+    Gettext.bindtextdomain('drive-menu', localePath);
+    _ = Gettext.domain('drive-menu').gettext;
 }
 
 let _indicator;

@@ -27,52 +27,13 @@ const Gio = imports.gi.Gio;
 const Mainloop = imports.mainloop;
 const Search = imports.ui.search;
 
-const SEARCH_ENGINE_GOOGLE = "Google";
-const SEARCH_ENGINE_BAIDU = "Baidu";
-const SEARCH_ENGINE_YAHOO = "Yahoo";
-const SEARCH_ENGINE_BING = "Bing";
-const SEARCH_ENGINE_FLICKR = "Flickr";
-const SEARCH_ENGINE_WIKIPEDIA = "Wikipedia";
-const SEARCH_ENGINE_TWITTER = "Twitter";
-const SEARCH_ENGINE_YOUTUBE = "YouTube";
+const Gettext = imports.gettext;
 
-const SEARCH_ENGINES = [{'uri': "http://www.google.com.hk/search?ie=UTF-8&q=",
-                         'title': SEARCH_ENGINE_GOOGLE,
-						 'icon': "google.png"
-                        },
-                        {'uri': "http://www.baidu.com/s?ie=utf8&wd=",
-                         'title': SEARCH_ENGINE_BAIDU,
-						 'icon': "baidu.png"
-                        },
-                        {'uri': "http://cn.search.yahoo.com/search?ie=UTF-8&p=",
-                         'title': SEARCH_ENGINE_YAHOO,
-						 'icon': "yahoo.png"
-                        },
-                        {'uri': "http://cn.bing.com/search?q=",
-                         'title': SEARCH_ENGINE_BING,
-						 'icon': "bing.png"
-                        },
-                        {'uri': "http://www.flickr.com/search/?f=hp&q=",
-                         'title': SEARCH_ENGINE_FLICKR,
-						 'icon': "flickr.png"
-                        },
-                        {'uri': "http://zh.wikipedia.org/wiki/",
-                         'title': SEARCH_ENGINE_WIKIPEDIA,
-						 'icon': "wikipedia.png"
-                        },
-                        {'uri': "https://twitter.com/search?q=",
-                         'title': SEARCH_ENGINE_TWITTER,
-						 'icon': "twitter.png"
-                        },
-                        {'uri': "http://www.youtube.com/results?search_query=",
-                         'title': SEARCH_ENGINE_YOUTUBE,
-						 'icon': "youtube.png"
-                        }
-                       ];
-
+let searchEngines;
 let searchProvidersBox = null;
 let searchEngineProvider = null;
 let currentPath = null;
+let _;
 
 function SearchEngineProvider() {
     this._init();
@@ -92,11 +53,11 @@ SearchEngineProvider.prototype = {
         return { 'id': id,
                  'name': title,
                  'createIcon': function(size) {
-					 let iconFile = Gio.file_new_for_path(currentPath + "/" + id.icon);
-					 let fileIcon = new Gio.FileIcon({file: iconFile});
+                     let iconFile = Gio.file_new_for_path(currentPath + "/" + id.icon);
+                     let fileIcon = new Gio.FileIcon({file: iconFile});
                      return new St.Icon({icon_size: size,
                                          gicon: fileIcon
-					 					});
+                                        });
                  }
 
                };
@@ -111,11 +72,11 @@ SearchEngineProvider.prototype = {
     listSearchEngine: function(terms) {
         let searchString = encodeURIComponent(terms.join(' '));
 
-        for (let i = 0; i < SEARCH_ENGINES.length; i++) {
-            SEARCH_ENGINES[i].search = searchString;
+        for (let i = 0; i < searchEngines.length; i++) {
+            searchEngines[i].search = searchString;
         }
 
-        return SEARCH_ENGINES;
+        return searchEngines;
     },
 
     /* start asynchronous search for terms */
@@ -129,8 +90,50 @@ SearchEngineProvider.prototype = {
 };
 
 function init(extensionMeta) {
-	searchProvidersBox = Main.overview._viewSelector._searchTab._searchResults._searchProvidersBox;
-	currentPath = extensionMeta.path;
+    let localePath = extensionMeta.path + '/locale';
+    Gettext.bindtextdomain('enhanced-search', localePath);
+    _ = Gettext.domain('enhanced-search').gettext;
+
+    let google = {'uri': "http://www.google.com.hk/search?ie=UTF-8&q=",
+                  'title': _("Google"),
+                  'icon': "google.png"
+                 };
+    let baidu = {'uri': "http://www.baidu.com/s?tn=sndo_1_dg&tr=mk3SLVN4HKm&word=",
+                 'title': _("Baidu"),
+                 'icon': "baidu.png"
+                };
+	let taobao = {'uri': "http://s.taobao.com/search?q=",
+                 'title': _("Taobao"),
+                 'icon': "taobao.png"
+                };
+    let yahoo = {'uri': "http://cn.search.yahoo.com/search?ie=UTF-8&p=",
+                 'title': _("Yahoo!"),
+                 'icon': "yahoo.png"
+                };
+    let bing = {'uri': "http://cn.bing.com/search?q=",
+                'title': _("Bing"),
+                'icon': "bing.png"
+               };
+    let flickr = {'uri': "http://www.flickr.com/search/?f=hp&q=",
+                  'title': _("Flickr"),
+                  'icon': "flickr.png"
+                 };
+    let wikipedia = {'uri': "http://zh.wikipedia.org/wiki/",
+                     'title': _("Wikipedia"),
+                     'icon': "wikipedia.png"
+                    };
+    let twitter = {'uri': "https://twitter.com/search?q=",
+                   'title': _("Twitter"),
+                   'icon': "twitter.png"
+                  };
+    let youtube = {'uri': "http://www.youtube.com/results?search_query=",
+                   'title': _("YouTube"),
+                   'icon': "youtube.png"
+                  };
+	searchEngines = eval(_("[google, bing, yahoo, flickr, wikipedia, twitter, youtube]"));
+
+    searchProvidersBox = Main.overview._viewSelector._searchTab._searchResults._searchProvidersBox;
+    currentPath = extensionMeta.path;
 }
 
 function enable() {
@@ -138,8 +141,8 @@ function enable() {
         searchEngineProvider = new SearchEngineProvider();
         Main.overview.addSearchProvider(searchEngineProvider);
     }
-	
-	searchProvidersBox.hide_all();
+
+    searchProvidersBox.hide_all();
 }
 
 function disable() {
@@ -147,6 +150,6 @@ function disable() {
         Main.overview.removeSearchProvider(searchEngineProvider);
         searchEngineProvider = null;
     }
-	
-	searchProvidersBox.show_all();
+
+    searchProvidersBox.show_all();
 }
