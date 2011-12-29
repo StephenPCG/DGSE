@@ -34,3 +34,6 @@ msgstr "YouTube"
 
 msgid "[google, bing, yahoo, flickr, wikipedia, twitter, youtube]"
 msgstr "[google, baidu, bing, yahoo, flickr, wikipedia, twitter, youtube]"
+
+msgid "Search Engine"
+msgstr "搜索引擎"
