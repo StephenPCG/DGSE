@@ -20,6 +20,9 @@ const SELECT_KEEP = 0;
 const SELECT_NEXT = 1;
 const SELECT_PREV = 2;
 
+const Gettext = imports.gettext;
+let _;
+
 function primaryModifier(mask) {
     if (mask == 0)
         return 0;
@@ -64,7 +67,7 @@ SwitchThumbnailIcon.prototype = {
         if (this.isWorkspace) {
             this.label = new St.Label(
                 {style_class: 'thumbnail-icon-font',
-                 text: "Workspace " + (window.get_workspace().index() + 1)});
+                 text: _("Workspace ") + (window.get_workspace().index() + 1)});
             let bin = new St.Bin({ x_align: St.Align.MIDDLE });
             bin.add_actor(this.label);
             this.actorBox.add(bin);
@@ -616,7 +619,10 @@ SwitchPopupWindow.prototype = {
 
 };
 
-function init(metadata) {
+function init(extensionMeta) {
+    let localePath = extensionMeta.path + '/locale';
+    Gettext.bindtextdomain('alt-tab', localePath);
+    _ = Gettext.domain('alt-tab').gettext;
 }
 
 function doAltTab(shellwm, binding, mask, window, backwards) {
