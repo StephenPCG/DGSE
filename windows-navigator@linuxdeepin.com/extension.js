@@ -195,15 +195,15 @@ function enable() {
 
     winInjections['_init'] = injectToFunction(Workspace.WindowOverlay.prototype, '_init', function(windowClone, parentActor) {
         this._id = null;
-        createdActors.push(this._text = new St.Label({ style_class: 'extension-windowsNavigator-window-tooltip' }));
+        createdActors.push(this._text = new St.Label({ style_class: 'extension-windowsNavigator-window-tooltip'}));
         this._text.hide();
-        parentActor.add_actor(this._text);
+        parentActor.add_actor(this._text, {align: St.Align.MIDDLE});
     });
 
     winInjections['updatePositions'] = injectToFunction(Workspace.WindowOverlay.prototype, 'updatePositions', function(cloneX, cloneY, cloneWidth, cloneHeight) {
         let textX = cloneX - 2;
         let textY = cloneY - 2;
-        this._text.set_position(Math.floor(textX), Math.floor(textY));
+        this._text.set_position(Math.floor(textX) - 30, Math.floor(textY) - 10);
         this._text.raise_top();
     });
 
