@@ -783,6 +783,7 @@ AppNameTooltip.prototype = {
         this.dockIcon.actor.reactive = true;
         this.dockIcon.actor.connect('enter-event', Lang.bind(this, this.openMenu));
         this.dockIcon.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+		this.actor.style_class = 'dock-tooltip-window';
 
         this.openMenu();
     },
@@ -834,7 +835,10 @@ AppNameTooltipItem.prototype = {
         params = Params.parse(params, { hover: false });
         PopupMenu.PopupBaseMenuItem.prototype._init.call(this, params);
 
-        this.text = new St.Label({ style_class: 'dock-appname-tooltip', text: dockIcon.app.get_name() });
+		let appName = dockIcon.app.get_name().trim();
+		global.log([appName, appName.length]);
+        this.text = new St.Label({ style_class: 'dock-appname-tooltip', 
+								   text: appName });
         this.addActor(this.text);
 
         this.actor.add_style_class_name('dock-appname-tooltip-item');
@@ -1170,6 +1174,7 @@ ShowDesktopTooltip.prototype = {
         this.dockIcon.actor.reactive = true;
         this.dockIcon.actor.connect('enter-event', Lang.bind(this, this.openMenu));
         this.dockIcon.actor.connect('leave-event', Lang.bind(this, this.requestCloseMenu));
+		this.actor.style_class = 'dock-tooltip-window';
 
         this.openMenu();
     },
